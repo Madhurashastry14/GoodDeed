@@ -1,6 +1,6 @@
 const express = require("express");
 const pool = require("./src/config/db");
-
+const authRoutes = require("./src/routes/authRoutes");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
@@ -20,6 +20,14 @@ app.get("/api/health", async (req, res) => {
       database: "disconnected",
     });
   }
+});
+
+app.use("/api/auth", authRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found",
+  });
 });
 
 const PORT = 3000 || process.env.PORT;
