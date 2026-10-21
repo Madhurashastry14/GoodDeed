@@ -1,4 +1,5 @@
 const authService = require("../services/authService");
+const tokenService = require("../services/tokenService");
 async function registerUser(req, res) {
   try {
     const { name, email, password } = req.body;
@@ -52,11 +53,23 @@ async function loginUser(req, res) {
         message: "password is required",
       });
     }
-    const user = await authService.getUser(email, password);
+    const user = await authService.getUser(
+      email.trim().toLowerCase(),
+      password,
+    );
+
+    res.cookie("refreshToken", await user.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.status(200).json({
       message: "Login successful",
-      user,
+      user: user.user,
+      accessToken: user.accessToken,
     });
   } catch (error) {
     if (error.statusCode === 401) {

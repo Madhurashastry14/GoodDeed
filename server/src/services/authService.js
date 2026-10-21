@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const tokenService = require("../services/tokenService");
 async function createUser(name, email, password) {
   const exsisting = await pool.query("SELECT id FROM users WHERE email=$1", [
     email,
@@ -38,6 +39,8 @@ async function getUser(email, password) {
   const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
+  const refreshToken = tokenService.generateRefreshToken();
+  const refreshTokenHash = tokenService.hashRefreshToken(refreshToken);
   return {
     user: {
       id: user.id,
@@ -45,6 +48,7 @@ async function getUser(email, password) {
       email: user.email,
     },
     accessToken,
+    refreshToken,
   };
 }
 
