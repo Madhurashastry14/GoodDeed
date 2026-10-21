@@ -1,9 +1,11 @@
 const express = require("express");
 const pool = require("./src/config/db");
 const authRoutes = require("./src/routes/authRoutes");
+const cookieparser = require("cookie-parser");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
+app.use(cookieparser());
 
 app.get("/api/health", async (req, res) => {
   try {

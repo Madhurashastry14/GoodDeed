@@ -37,10 +37,11 @@ async function getUser(email, password) {
     throw error;
   }
   const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "1m",
   });
+
   const refreshToken = tokenService.generateRefreshToken();
-  const refreshTokenHash = tokenService.hashRefreshToken(refreshToken);
+  await tokenService.saveRefreshToken(user.id, refreshToken);
   return {
     user: {
       id: user.id,
@@ -52,4 +53,21 @@ async function getUser(email, password) {
   };
 }
 
-module.exports = { createUser, getUser };
+async function refreshAccessToken(refresToken) {
+  const isValidrefreshToken =
+    await tokenService.findValidRefreshToken(refresToken);
+  if (!isValidrefreshToken) {
+    const error = new Error("Invalid or expired refresh token");
+    error.statuscode = 401;
+    throw error;
+  }
+  const accessToken = jwt.sign(
+    { userId: isValidrefreshToken.userId },
+    process.env.JWT_SECRET,
+    { expiresIn: "1m" },
+  );
+
+  return accessToken;
+}
+
+module.exports = { createUser, getUser, refreshAccessToken };

@@ -84,4 +84,37 @@ async function loginUser(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser };
+async function refresh(req, res) {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        error: "Refresh Token is missing",
+      });
+    }
+    const accessToken = await authService.refreshAccessToken(refreshToken);
+    return res.status(200).json({
+      accessToken,
+    });
+  } catch (error) {
+    if (error.statusCode === 401) {
+      res.clearCookie("refreshtoken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "rpoduction",
+        sameSite: "lax",
+        path: "/api/auth",
+      });
+
+      res.status(401).json({
+        error: "Invalid or expired refresh token",
+      });
+    }
+    console.error("Token refresh failed", error.message);
+    res.status(500).json({
+      error: "Unable to refres token",
+    });
+  }
+}
+
+module.exports = { registerUser, loginUser, refresh };
