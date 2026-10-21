@@ -37,7 +37,7 @@ async function getUser(email, password) {
     throw error;
   }
   const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-    expiresIn: "1m",
+    expiresIn: "15m",
   });
 
   const refreshToken = tokenService.generateRefreshToken();
@@ -64,7 +64,7 @@ async function refreshAccessToken(refresToken) {
   const accessToken = jwt.sign(
     { userId: isValidrefreshToken.userId },
     process.env.JWT_SECRET,
-    { expiresIn: "1m" },
+    { expiresIn: "15m" },
   );
 
   return accessToken;

@@ -58,7 +58,7 @@ async function loginUser(req, res) {
       password,
     );
 
-    res.cookie("refreshToken", await user.refreshToken, {
+    res.cookie("refreshToken", user.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -117,4 +117,26 @@ async function refresh(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser, refresh };
+async function logout(req, res) {
+  try {
+    const refreshtoken = req.cookies?.refreshToken;
+    if (refreshtoken) {
+      await tokenService.revokeRefreshToken(refreshtoken);
+    }
+    res.clearCookie("refreshtoken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "rpoduction",
+      sameSite: "lax",
+      path: "/api/auth",
+    });
+
+    return res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout failed:", error.message);
+    return res.status(500).json({ error: "Unable to log out" });
+  }
+}
+
+module.exports = { registerUser, loginUser, refresh, logout };
