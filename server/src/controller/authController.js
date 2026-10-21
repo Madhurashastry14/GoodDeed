@@ -38,4 +38,37 @@ async function registerUser(req, res) {
   }
 }
 
-module.exports = { registerUser };
+async function loginUser(req, res) {
+  try {
+    const { email, password } = req.body;
+    if (typeof email !== "string" || email.trim() === "") {
+      res.status(200).json({
+        message: "email is required",
+      });
+    }
+
+    if (typeof password !== "string" || password.trim() === "") {
+      res.status(200).json({
+        message: "password is required",
+      });
+    }
+    const user = await authService.getUser(email, password);
+
+    res.status(200).json({
+      message: "Login successful",
+      user,
+    });
+  } catch (error) {
+    if (error.statusCode === 401) {
+      return res.status(401).json({
+        error: error.message,
+      });
+    }
+    console.error("Login Failed", error.message);
+    res.status(500).json({
+      error: "Unable to login",
+    });
+  }
+}
+
+module.exports = { registerUser, loginUser };
