@@ -1,0 +1,36 @@
+const pool = require("../config/db");
+
+async function createOrganization({
+  name,
+  description,
+  city,
+  website,
+  userId,
+}) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const organizationResult = await client.query(
+      "INSERT INTO organizations(name,description,city,website,created_by) VALUES ($1,$2,$3,$4,$5) RETURNING id,name,description,city,website,verification_status,created_by,created_at ",
+      [name, description || null, city, website || null, userId],
+    );
+
+    const organization = organizationResult.rows[0];
+    await client.query(
+      "INSERT INTO organization_members(organization_id,user_id,role) VALUES ($1,$2,'owner')",
+      [organization.id, userId],
+    );
+
+    await client.query("COMMIT");
+    return organization;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = {
+  createOrganization,
+};
