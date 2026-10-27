@@ -1,4 +1,5 @@
 const organizationService = require("../services/organizationService");
+
 async function createOrganization(req, res) {
   try {
     const { name, description, city, website } = req.body;
@@ -41,4 +42,18 @@ async function createOrganization(req, res) {
   }
 }
 
-module.exports = { createOrganization };
+async function getOrganization(req, res) {
+  try {
+    const organization = await organizationService.getOrganization();
+    return res.status(200).json({
+      organization,
+    });
+  } catch (error) {
+    console.error("Get organization failed:", error.message);
+    return res.status(500).json({
+      error: "Unable to fetch organizations",
+    });
+  }
+}
+
+module.exports = { createOrganization, getOrganization };

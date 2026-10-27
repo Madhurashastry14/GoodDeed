@@ -31,6 +31,14 @@ async function createOrganization({
   }
 }
 
+async function getOrganization() {
+  const result = await pool.query(
+    "SELECT id,name,description,city,website,created_at FROM organizations ORDER BY created_at",
+  );
+  return result.rows;
+}
+
 module.exports = {
   createOrganization,
+  getOrganization,
 };
