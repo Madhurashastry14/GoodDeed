@@ -5,5 +5,5 @@ const router = express.Router();
 
 router.get("/", organizationController.getOrganization);
 router.post("/", authMiddleware, organizationController.createOrganization);
-
+router.get("/:id", organizationController.getOrganizationById);
 module.exports = router;
