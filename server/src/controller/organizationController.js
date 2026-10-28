@@ -73,4 +73,25 @@ async function getOrganizationById(req, res) {
   }
 }
 
-module.exports = { createOrganization, getOrganization, getOrganizationById };
+async function getMyOrganization(req, res) {
+  try {
+    const organizations = await organizationService.getMyOrganizations(
+      req.user.id,
+    );
+    return res.status(200).json({
+      organizations,
+    });
+  } catch (error) {
+    console.error("Get organization failed:", error.stack);
+    return res.status(500).json({
+      error: "Unable to fetch organizations",
+    });
+  }
+}
+
+module.exports = {
+  createOrganization,
+  getOrganization,
+  getOrganizationById,
+  getMyOrganization,
+};

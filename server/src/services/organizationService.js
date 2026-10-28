@@ -45,8 +45,24 @@ async function getOrganizationById(userId) {
   );
   return result.rows;
 }
+
+async function getMyOrganizations(userId) {
+  const result = await pool.query(
+    `SELECT o.id, o.name,o.description, o.city,o.website, o.verification_status, om.role
+     FROM organizations o
+     JOIN organization_members om
+       ON om.organization_id = o.id
+     WHERE om.user_id = $1
+     ORDER BY o.created_at DESC`,
+    [userId],
+  );
+
+  return result.rows;
+}
+
 module.exports = {
   createOrganization,
   getOrganization,
   getOrganizationById,
+  getMyOrganizations,
 };
