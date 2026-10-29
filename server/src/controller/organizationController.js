@@ -114,10 +114,46 @@ async function getOrganizationMembers(req, res) {
   }
 }
 
+async function addOrganizationMember(req, res) {
+  try {
+    const organizationId = req.params.id;
+    const { userId } = req.body;
+
+    if (typeof userId !== "string" || userId.trim() === "") {
+      return res.status(400).json({
+        error: "UserId is required",
+      });
+    }
+    console.log(req.user.id);
+    const member = await organizationService.addOrganizationMember(
+      organizationId,
+      userId.trim(),
+      req.user.id,
+    );
+
+    return res.status(201).json({
+      message: "Member created successfully",
+      member,
+    });
+  } catch (error) {
+    console.error("create organization members failed:", error.message);
+
+    if (error.statusCode === 409) {
+      return res.status(409).json({
+        error: "Member already exist",
+      });
+    }
+    return res.status(500).json({
+      error: "Unable to create organization members",
+    });
+  }
+}
+
 module.exports = {
   createOrganization,
   getOrganization,
   getOrganizationById,
   getMyOrganization,
   getOrganizationMembers,
+  addOrganizationMember,
 };

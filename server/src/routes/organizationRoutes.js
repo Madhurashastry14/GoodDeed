@@ -9,4 +9,10 @@ router.get("/mine", authMiddleware, organizationController.getMyOrganization);
 router.get("/:id", organizationController.getOrganizationById);
 
 router.get("/:id/members", organizationController.getOrganizationMembers);
+router.post(
+  "/:id/members",
+  authMiddleware,
+  organizationController.addOrganizationMember,
+);
+
 module.exports = router;

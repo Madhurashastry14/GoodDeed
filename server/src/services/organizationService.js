@@ -65,8 +65,64 @@ async function getOrganizationMembers(organizationId) {
     "SELECT u.id, u.name, om.role, u.created_at FROM organization_members om JOIN users u ON u.id=om.user_id WHERE om.organization_id=$1",
     [organizationId],
   );
-
   return result.rows;
+}
+
+//add existing user as member of a organization
+async function addOrganizationMember(organizationId, userId, roleId) {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const role = await client.query(
+      "SELECT role FROM organization_members where organization_id=$1 AND user_id=$2",
+      [organizationId, roleId],
+    );
+
+    if (
+      role.rows.length === 0 ||
+      !["owner", "admin"].includes(role.rows[0].role)
+    ) {
+      const error = new Error("You can not add member");
+      error.statuscode = 403;
+      throw error;
+    }
+
+    const user = await client.query("SELECT * FROM users WHERE id = $1", [
+      userId,
+    ]);
+
+    if (!user.rows.length) {
+      const error = new Error("User not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const isExisting = await client.query(
+      "SELECT * FROM organization_members WHERE organization_id=$1 AND user_id=$2",
+      [organizationId, userId],
+    );
+
+    if (isExisting.rows.length) {
+      const error = new Error("Member already exist");
+      error.statusCode = 409;
+      throw error;
+    }
+
+    const result = await client.query(
+      "INSERT INTO organization_members(organization_id,user_id,role) VALUES ($1,$2,'member') RETURNING organization_id,user_id,role",
+      [organizationId, userId],
+    );
+
+    await client.query("COMMIT");
+    return result.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 module.exports = {
@@ -75,4 +131,5 @@ module.exports = {
   getOrganizationById,
   getMyOrganizations,
   getOrganizationMembers,
+  addOrganizationMember,
 };
