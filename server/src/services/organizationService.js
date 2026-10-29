@@ -60,9 +60,19 @@ async function getMyOrganizations(userId) {
   return result.rows;
 }
 
+async function getOrganizationMembers(organizationId) {
+  const result = await pool.query(
+    "SELECT u.id, u.name, om.role, u.created_at FROM organization_members om JOIN users u ON u.id=om.user_id WHERE om.organization_id=$1",
+    [organizationId],
+  );
+
+  return result.rows;
+}
+
 module.exports = {
   createOrganization,
   getOrganization,
   getOrganizationById,
   getMyOrganizations,
+  getOrganizationMembers,
 };

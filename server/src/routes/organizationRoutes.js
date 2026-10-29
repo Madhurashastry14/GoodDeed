@@ -7,4 +7,6 @@ router.get("/", organizationController.getOrganization);
 router.post("/", authMiddleware, organizationController.createOrganization);
 router.get("/mine", authMiddleware, organizationController.getMyOrganization);
 router.get("/:id", organizationController.getOrganizationById);
+
+router.get("/:id/members", organizationController.getOrganizationMembers);
 module.exports = router;
