@@ -77,14 +77,13 @@ Sensitive account information must not be exposed through public profile endpoin
 
 ## 6. Organization Membership
 
-| Method | Endpoint                             | Access                | Status      | Description            |
-| ------ | ------------------------------------ | --------------------- | ----------- | ---------------------- |
-| POST   | `/organizations/:id/members`         | Owner/admin           | In progress | Add an existing user   |
-| PATCH  | `/organizations/:id/members/:userId` | Owner                 | In progress | Change a member's role |
-| DELETE | `/organizations/:id/members/:userId` | Owner/admin           | In progress | Remove a member        |
-| POST   | `/organizations/:id/invitations`     | Owner/admin           | Planned     | Invite a user          |
-| GET    | `/organizations/:id/invitations`     | Owner/admin           | Planned     | List invitations       |
-| POST   | `/invitations/:token/accept`         | Authenticated invitee | Planned     | Accept an invitation   |
+| Method | Endpoint                             | Access                | Status      | Description          |
+| ------ | ------------------------------------ | --------------------- | ----------- | -------------------- |
+| POST   | `/organizations/:id/members`         | Owner/admin           | In progress | Add an existing user |
+| DELETE | `/organizations/:id/members/:userId` | Owner/admin           | In progress | Remove a member      |
+| POST   | `/organizations/:id/invitations`     | Owner/admin           | Planned     | Invite a user        |
+| GET    | `/organizations/:id/invitations`     | Owner/admin           | Planned     | List invitations     |
+| POST   | `/invitations/:token/accept`         | Authenticated invitee | Planned     | Accept an invitation |
 
 ## 7. Volunteer Opportunities
 
