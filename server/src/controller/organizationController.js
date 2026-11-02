@@ -124,7 +124,6 @@ async function addOrganizationMember(req, res) {
         error: "UserId is required",
       });
     }
-    console.log(req.user.id);
     const member = await organizationService.addOrganizationMember(
       organizationId,
       userId.trim(),
@@ -149,6 +148,48 @@ async function addOrganizationMember(req, res) {
   }
 }
 
+async function removemember(req, res) {
+  try {
+    const organizationId = req.params.id;
+    const userId = req.params.userId;
+
+    if (typeof userId !== "string" || userId.trim() === "") {
+      return res.status(400).json({
+        error: "UserId is required",
+      });
+    }
+
+    const removedmember =
+      await organizationService.removeMemberFromOrganization(
+        organizationId,
+        req.user.id,
+        userId,
+      );
+
+    return res.status(200).json({
+      message: "Member deleted successfully",
+      removedmember,
+    });
+  } catch (error) {
+    console.error("remove organization members failed:", error.message);
+
+    if (error.statusCode === 403) {
+      return res.status(403).json({
+        error: error.message,
+      });
+    }
+
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        error: error.message,
+      });
+    }
+    return res.status(500).json({
+      error: "Unable to remove organization members",
+    });
+  }
+}
+
 module.exports = {
   createOrganization,
   getOrganization,
@@ -156,4 +197,5 @@ module.exports = {
   getMyOrganization,
   getOrganizationMembers,
   addOrganizationMember,
+  removemember,
 };

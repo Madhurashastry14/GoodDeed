@@ -15,4 +15,9 @@ router.post(
   organizationController.addOrganizationMember,
 );
 
+router.delete(
+  "/:id/members/:userId",
+  authMiddleware,
+  organizationController.removemember,
+);
 module.exports = router;

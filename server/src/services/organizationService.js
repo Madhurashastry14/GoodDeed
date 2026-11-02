@@ -125,6 +125,47 @@ async function addOrganizationMember(organizationId, userId, roleId) {
   }
 }
 
+async function removeMemberFromOrganization(organizationId, roleId, userId) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const role = await client.query(
+      "SELECT role FROM organization_members WHERE organization_id=$1 AND user_id=$2",
+      [organizationId, roleId],
+    );
+
+    if (!["owner"].includes(role.rows[0].role)) {
+      const error = new Error("You can not remove a member");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    const user = await client.query(
+      "SELECT user_id from organization_members WHERE organization_id=$1 AND user_id=$2",
+      [organizationId, userId],
+    );
+
+    if (!user.rows.length) {
+      const error = new Error("Member not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const removedMember = await client.query(
+      "DELETE FROM organization_members WHERE organization_id=$1 AND user_id=$2 RETURNING *",
+      [organizationId, userId],
+    );
+
+    await client.query("COMMIT");
+    return removedMember.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   createOrganization,
   getOrganization,
@@ -132,4 +173,5 @@ module.exports = {
   getMyOrganizations,
   getOrganizationMembers,
   addOrganizationMember,
+  removeMemberFromOrganization,
 };
