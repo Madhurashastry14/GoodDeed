@@ -42,6 +42,31 @@ async function createOrganization(req, res) {
   }
 }
 
+async function patchOrganizationDetail(req, res) {
+  try {
+    const organizationId = req.params.id;
+    const updatedOrganization = await organizationService.patchOrganizationInfo(
+      organizationId,
+      req.user.id,
+      req.body,
+    );
+    if (!updatedOrganization) {
+      return res.status(404).json({
+        error: "organization Not found",
+      });
+    }
+    return res.status(200).json({
+      message: "Organization updated successfully",
+      updatedOrganization,
+    });
+  } catch (error) {
+    console.error("Update organization failed:", error);
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to update organization",
+    });
+  }
+}
+
 async function getOrganization(req, res) {
   try {
     const organization = await organizationService.getOrganization();
@@ -192,6 +217,7 @@ async function removemember(req, res) {
 
 module.exports = {
   createOrganization,
+  patchOrganizationDetail,
   getOrganization,
   getOrganizationById,
   getMyOrganization,

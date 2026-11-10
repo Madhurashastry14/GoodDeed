@@ -31,6 +31,34 @@ async function createOrganization({
   }
 }
 
+async function patchOrganizationInfo(organizationId, roleId, info) {
+  const { name, description, city, website } = info;
+  const role = await pool.query(
+    "SELECT role FROM organization_members WHERE organization_id=$1 AND user_id=$2",
+    [organizationId, roleId],
+  );
+
+  if (role.rows.length === 0 || role.rows[0].role !== "owner") {
+    const error = new Error(
+      "You are not allowed to update organization details",
+    );
+    error.statusCode = 403;
+    throw error;
+  }
+  const updateResult = await pool.query(
+    "UPDATE organizations SET name=COALESCE($1,name), description=COALESCE($2,description), city=COALESCE($3,city),website=COALESCE($4,website) WHERE id=$5 RETURNING id,name,description,city,website,verification_status,created_at",
+    [
+      name ?? null,
+      description ?? null,
+      city ?? null,
+      website ?? null,
+      organizationId,
+    ],
+  );
+
+  return updateResult.rows[0];
+}
+
 async function getOrganization() {
   const result = await pool.query(
     "SELECT id,name,description,city,website,created_at FROM organizations ORDER BY created_at",
@@ -168,6 +196,7 @@ async function removeMemberFromOrganization(organizationId, roleId, userId) {
 
 module.exports = {
   createOrganization,
+  patchOrganizationInfo,
   getOrganization,
   getOrganizationById,
   getMyOrganizations,
