@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("./src/config/db");
 const authRoutes = require("./src/routes/authRoutes");
+const userRoutes = require("./src/routes/userRoutes");
 const organizationRoutes = require("./src/routes/organizationRoutes");
 const cookieparser = require("cookie-parser");
 const app = express();
@@ -26,6 +27,7 @@ app.get("/api/health", async (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/organizations", organizationRoutes);
 
 app.use((req, res) => {

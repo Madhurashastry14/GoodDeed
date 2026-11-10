@@ -107,7 +107,7 @@ async function getMyOrganization(req, res) {
       organizations,
     });
   } catch (error) {
-    console.error("Get organization failed:", error.stack);
+    console.error("Get organization failed:", error.message);
     return res.status(500).json({
       error: "Unable to fetch organizations",
     });
