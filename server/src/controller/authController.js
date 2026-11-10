@@ -4,15 +4,15 @@ async function registerUser(req, res) {
   try {
     const { name, email, password } = req.body;
     if (typeof name !== "string" || name.trim() === "") {
-      res.status(400).json({
+      return res.status(400).json({
         message: "name is required",
       });
     } else if (typeof email !== "string" || email.trim() === "") {
-      res.status(400).json({
+      return res.status(400).json({
         message: "email is required",
       });
     } else if (typeof password !== "string" || password.length < 8) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "password is required",
       });
     }
@@ -23,7 +23,7 @@ async function registerUser(req, res) {
       password,
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Registration successful",
       user,
     });
@@ -33,7 +33,7 @@ async function registerUser(req, res) {
     }
     console.error("Registration failed:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Unable to register User",
     });
   }
@@ -43,16 +43,17 @@ async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
     if (typeof email !== "string" || email.trim() === "") {
-      res.status(200).json({
+      return res.status(400).json({
         message: "email is required",
       });
     }
 
     if (typeof password !== "string" || password.trim() === "") {
-      res.status(200).json({
+      return res.status(400).json({
         message: "password is required",
       });
     }
+
     const user = await authService.getUser(
       email.trim().toLowerCase(),
       password,
@@ -66,7 +67,7 @@ async function loginUser(req, res) {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       user: user.user,
       accessToken: user.accessToken,
@@ -78,7 +79,7 @@ async function loginUser(req, res) {
       });
     }
     console.error("Login Failed", error.message);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Unable to login",
     });
   }
@@ -106,12 +107,12 @@ async function refresh(req, res) {
         path: "/api/auth",
       });
 
-      res.status(401).json({
+      return res.status(401).json({
         error: "Invalid or expired refresh token",
       });
     }
     console.error("Token refresh failed", error.message);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Unable to refres token",
     });
   }

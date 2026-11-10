@@ -24,9 +24,9 @@ async function createOrganization(req, res) {
 
     const organization = await organizationService.createOrganization({
       name: name.trim(),
-      description: description.trim() || null,
+      description: description?.trim() || null,
       city: city.trim(),
-      website: website.trim() || null,
+      website: website?.trim() || null,
       userId: req.user.id,
     });
 
