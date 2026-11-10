@@ -47,13 +47,13 @@ This document defines the API endpoints, authentication requirements, request fo
 
 **Status: Planned unless already implemented.**
 
-| Method | Endpoint             | Access                     | Description                              |
-| ------ | -------------------- | -------------------------- | ---------------------------------------- |
-| GET    | `/users/me`          | Authenticated              | Retrieve the current user's profile      |
-| PATCH  | `/users/me`          | Authenticated              | Update the current user's profile        |
-| GET    | `/users/:id`         | Public profile fields only | View a user's public profile             |
-| PATCH  | `/users/me/password` | Authenticated              | Change the account password              |
-| DELETE | `/users/me`          | Authenticated              | Request account deactivation or deletion |
+| Method | Endpoint                  | Access                     | Description                              |
+| ------ | ------------------------- | -------------------------- | ---------------------------------------- |
+| GET    | `/users/profile`          | Authenticated              | Retrieve the current user's profile      |
+| PATCH  | `/users/profile`          | Authenticated              | Update the current user's profile        |
+| GET    | `/users/:id`              | Public profile fields only | View a user's public profile             |
+| PATCH  | `/users/profile/password` | Authenticated              | Change the account password              |
+| DELETE | `/users/profile`          | Authenticated              | Request account deactivation or deletion |
 
 Profile fields may include name, bio, city, interests, and other explicitly public information.
 
@@ -68,8 +68,9 @@ Sensitive account information must not be exposed through public profile endpoin
 | GET    | `/organizations/mine`                   | Authenticated | List the current user's organizations    |
 | GET    | `/organizations/:id`                    | Public        | Retrieve organization details            |
 | GET    | `/organizations/:id/members`            | Public        | List organization members                |
-| PATCH  | `/organizations/:id`                    | Owner/admin   | Update organization details              |
-| POST   | `/organizations/:id/verification`       | Owner/admin   | Submit verification information          |
+| PATCH  | `/organizations/:id`                    | Owner         | Update organization details              |
+| DELETE | `/organizations/:id`                    | owner         | Delete a organizations                   |
+| POST   | `/organizations/:id/verification`       | Owner         | Submit verification information          |
 | GET    | `/admin/organizations/pending`          | Admin         | List organizations awaiting verification |
 | PATCH  | `/admin/organizations/:id/verification` | Admin         | Approve or reject verification           |
 
@@ -77,13 +78,13 @@ Sensitive account information must not be exposed through public profile endpoin
 
 ## 6. Organization Membership
 
-| Method | Endpoint                             | Access                | Status      | Description          |
-| ------ | ------------------------------------ | --------------------- | ----------- | -------------------- |
-| POST   | `/organizations/:id/members`         | Owner/admin           | In progress | Add an existing user |
-| DELETE | `/organizations/:id/members/:userId` | Owner/admin           | In progress | Remove a member      |
-| POST   | `/organizations/:id/invitations`     | Owner/admin           | Planned     | Invite a user        |
-| GET    | `/organizations/:id/invitations`     | Owner/admin           | Planned     | List invitations     |
-| POST   | `/invitations/:token/accept`         | Authenticated invitee | Planned     | Accept an invitation |
+| Method | Endpoint                             | Access               | Description          |
+| ------ | ------------------------------------ | -------------------- | -------------------- |
+| POST   | `/organizations/:id/members`         | Owner                | Add an existing user |
+| DELETE | `/organizations/:id/members/:userId` | Owner                | Remove a member      |
+| POST   | `/organizations/:id/invitations`     | Owner                | Invite a user        |
+| GET    | `/organizations/:id/invitations`     | Owner/admin          | List invitations     |
+| POST   | `/invitations/:token/accept`         | Authenticated invite | Accept an invitation |
 
 ## 7. Volunteer Opportunities
 
