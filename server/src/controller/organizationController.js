@@ -162,13 +162,10 @@ async function addOrganizationMember(req, res) {
   } catch (error) {
     console.error("create organization members failed:", error.message);
 
-    if (error.statusCode === 409) {
-      return res.status(409).json({
-        error: "Member already exist",
-      });
-    }
-    return res.status(500).json({
-      error: "Unable to create organization members",
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to create organization member",
     });
   }
 }
@@ -198,19 +195,10 @@ async function removemember(req, res) {
   } catch (error) {
     console.error("remove organization members failed:", error.message);
 
-    if (error.statusCode === 403) {
-      return res.status(403).json({
-        error: error.message,
-      });
-    }
-
-    if (error.statusCode === 404) {
-      return res.status(404).json({
-        error: error.message,
-      });
-    }
-    return res.status(500).json({
-      error: "Unable to remove organization members",
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to remove organization member",
     });
   }
 }
