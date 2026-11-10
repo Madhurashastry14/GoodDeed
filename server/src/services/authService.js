@@ -16,7 +16,9 @@ async function createUser(name, email, password) {
     "INSERT INTO users(name,email,password_hash) VALUES ($1,$2,$3)",
     [name, email, passswordHash],
   );
-  return result.rows[0];
+  const user = result.rows[0];
+  await pool.query("INSERT INTO profiles(user_id) VALUES $1", [user.id]);
+  return user;
 }
 
 async function getUser(email, password) {
