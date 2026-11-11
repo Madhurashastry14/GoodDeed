@@ -6,4 +6,10 @@ const router = express.Router();
 router.get("/profile", authMiddleware, userController.getProfile);
 router.get("/:id", userController.getPublicProfile);
 router.patch("/profile", authMiddleware, userController.patchProfile);
+
+router.patch(
+  "/profile/password",
+  authMiddleware,
+  userController.changePassword,
+);
 module.exports = router;

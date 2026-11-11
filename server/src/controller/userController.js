@@ -70,4 +70,37 @@ async function patchProfile(req, res) {
   }
 }
 
-module.exports = { getProfile, getPublicProfile, patchProfile };
+async function changePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (typeof currentPassword !== "string" || currentPassword.trim() === "") {
+      return res.status(400).json({
+        message: "current password is required",
+      });
+    }
+
+    if (typeof newPassword !== "string" || newPassword.trim() === "") {
+      return res.status(400).json({
+        message: "new password is required",
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        message: "new password should be different from the currect password",
+      });
+    }
+    await userService.patchPassword(req.user.id, currentPassword, newPassword);
+
+    return res
+      .status(200)
+      .json({ message: "Password changed successfully. please log in again" });
+  } catch (error) {
+    console.error("change password failed:", error.message);
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to change password",
+    });
+  }
+}
+
+module.exports = { getProfile, getPublicProfile, patchProfile, changePassword };
