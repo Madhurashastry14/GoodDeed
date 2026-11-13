@@ -12,6 +12,11 @@ router.patch(
 );
 router.get("/mine", authMiddleware, organizationController.getMyOrganization);
 router.get("/:id", organizationController.getOrganizationById);
+router.delete(
+  "/:id",
+  authMiddleware,
+  organizationController.deleteOrganization,
+);
 
 router.get("/:id/members", organizationController.getOrganizationMembers);
 router.post(

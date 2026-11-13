@@ -194,6 +194,47 @@ async function removeMemberFromOrganization(organizationId, roleId, userId) {
   }
 }
 
+async function deleteOrganization(organizationId, roleId) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const organization = await client.query(
+      "SELECT id FROM organizations WHERE id=$1",
+      [organizationId],
+    );
+
+    if (organization.rows.length === 0) {
+      const error = new Error("Organization does not exists");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const role = await client.query(
+      "SELECT * FROM organization_members WHERE organization_id=$1 AND user_id=$2",
+      [organizationId, roleId],
+    );
+
+    if (role.rows[0].role !== "owner") {
+      const error = new Error("You are not allowed to delete the organization");
+      error.statusCode = 403;
+      throw error;
+    }
+    const deletedOrganization = await client.query(
+      "DELETE FROM organizations WHERE id=$1",
+      [organizationId],
+    );
+
+    await client.query("COMMIT");
+    return deletedOrganization.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   createOrganization,
   patchOrganizationInfo,
@@ -203,4 +244,5 @@ module.exports = {
   getOrganizationMembers,
   addOrganizationMember,
   removeMemberFromOrganization,
+  deleteOrganization,
 };

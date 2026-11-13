@@ -203,6 +203,29 @@ async function removemember(req, res) {
   }
 }
 
+async function deleteOrganization(req, res) {
+  try {
+    const organizationId = req.params.id;
+    const userId = req.user.id;
+
+    const deletedOrganization = await organizationService.deleteOrganization(
+      organizationId,
+      userId,
+    );
+
+    return res.status(200).json({
+      message: "Organization deleted successfully",
+      deleteOrganization,
+    });
+  } catch (error) {
+    console.error("delete organization failed:", error.message);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to delete organization",
+    });
+  }
+}
+
 module.exports = {
   createOrganization,
   patchOrganizationDetail,
@@ -212,4 +235,5 @@ module.exports = {
   getOrganizationMembers,
   addOrganizationMember,
   removemember,
+  deleteOrganization,
 };
