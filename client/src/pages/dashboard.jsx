@@ -17,7 +17,7 @@ import {
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
 import "../styles/dashboard.css";
-import { getMyOrganizations } from "../services/authService";
+import { getMyOrganizations } from "../services/api";
 
 const actions = [
   {
