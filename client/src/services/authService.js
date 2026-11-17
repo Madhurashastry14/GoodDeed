@@ -44,3 +44,41 @@ export function logoutUser() {
     method: "POST",
   });
 }
+
+const ORGANIZATIONS_URL = "http://localhost:3000/api/organizations";
+
+export async function getOrganizations() {
+  const response = await fetch(ORGANIZATIONS_URL);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch organizations");
+  }
+
+  return data;
+}
+
+export async function getOrganizationById(id) {
+  const response = await fetch(`${ORGANIZATIONS_URL}/${id}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch organization");
+  }
+
+  return data;
+}
+
+export async function getOrganizationMembers(id) {
+  const response = await fetch(`${ORGANIZATIONS_URL}/${id}/members`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch members");
+  }
+
+  return data;
+}

@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Construction } from "lucide-react";
 import Navbar from "./navbar";
+import { useAuth } from "../context/authContext";
 
 export default function ComingSoon({ title }) {
+  const { isAuthenticated } = useAuth();
+
   return (
     <>
       <Navbar />
@@ -40,7 +43,7 @@ export default function ComingSoon({ title }) {
         </p>
 
         <Link
-          to="/"
+          to={isAuthenticated ? "/dashboard" : "/"}
           style={{
             marginTop: 25,
             color: "#176c3b",
@@ -52,7 +55,7 @@ export default function ComingSoon({ title }) {
           }}
         >
           <ArrowLeft size={17} />
-          Back to GoodDeed
+          {isAuthenticated ? "Back to dashboard" : "Back to GoodDeed"}
         </Link>
       </main>
     </>

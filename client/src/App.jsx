@@ -4,6 +4,8 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
+import OrganizationDetails from "./pages/organizationDetails";
+import Organizations from "./pages/organizations";
 
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
@@ -27,15 +29,8 @@ export default function App() {
           }
         />
 
-        {/* Organizations: backend implemented, frontend next */}
-        <Route
-          path="/organizations"
-          element={<ComingSoon title="Organizations" />}
-        />
-        <Route
-          path="/organizations/:id"
-          element={<ComingSoon title="Organization Details" />}
-        />
+        <Route path="/organizations" element={<Organizations />} />
+        <Route path="/organizations/:id" element={<OrganizationDetails />} />
 
         <Route
           path="/my-organizations"
