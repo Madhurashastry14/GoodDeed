@@ -167,11 +167,6 @@ export default function Profile() {
                 <h2>{profile.name || "GoodDeed Member"}</h2>
 
                 <p>{profile.email}</p>
-
-                <div className="profile-member-label">
-                  <UserRound size={15} />
-                  Community Member
-                </div>
               </aside>
 
               <section className="profile-card">

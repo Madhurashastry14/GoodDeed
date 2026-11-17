@@ -81,19 +81,6 @@
   overflow-wrap: anywhere;
 }
 
-.profile-member-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 20px;
-  padding: 9px 13px;
-  border-radius: 20px;
-  background: #e9f4ea;
-  color: #176c3b;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .profile-card {
   padding: 32px;
 }
