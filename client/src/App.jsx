@@ -7,6 +7,7 @@ import Dashboard from "./pages/dashboard";
 import OrganizationDetails from "./pages/organizationDetails";
 import Organizations from "./pages/organizations";
 import CreateOrganization from "./pages/createOrganization";
+import MyOrganizations from "./pages/myOrganizations";
 
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
@@ -45,7 +46,7 @@ export default function App() {
           path="/my-organizations"
           element={
             <ProtectedRoute>
-              <ComingSoon title="My Organizations" />
+              <MyOrganizations />
             </ProtectedRoute>
           }
         />

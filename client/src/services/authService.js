@@ -102,3 +102,21 @@ export async function createOrganization(organizationData, accessToken) {
 
   return data;
 }
+
+export async function getMyOrganizations(accessToken) {
+  const response = await fetch("http://localhost:3000/api/organizations/mine", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch your organizations");
+  }
+
+  return data;
+}
