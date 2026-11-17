@@ -157,3 +157,49 @@ export async function updateMyProfile(profileData, accessToken) {
 
   return data;
 }
+
+export async function updateOrganization(id, organizationData, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/organizations/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(organizationData),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to update organization");
+  }
+
+  return data;
+}
+
+export async function deleteOrganization(id, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/organizations/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  // DELETE may return 204 No Content.
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(data?.error || "Failed to delete organization");
+  }
+
+  return data;
+}

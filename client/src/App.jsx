@@ -9,6 +9,8 @@ import Organizations from "./pages/organizations";
 import CreateOrganization from "./pages/createOrganization";
 import MyOrganizations from "./pages/myOrganizations";
 import Profile from "./pages/profile";
+import EditOrganization from "./pages/editOrganization";
+
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
@@ -41,6 +43,14 @@ export default function App() {
           }
         />
         <Route path="/organizations/:id" element={<OrganizationDetails />} />
+        <Route
+          path="/organizations/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditOrganization />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/my-organizations"

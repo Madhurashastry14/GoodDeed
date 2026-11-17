@@ -10,10 +10,7 @@ import {
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
-import {
-  //   getOrganizationById,
-  getOrganizationMembers,
-} from "../services/api";
+import { getOrganizationById, getOrganizationMembers } from "../services/api";
 
 import "../styles/organizationDetails.css";
 
@@ -23,30 +20,43 @@ export default function OrganizationDetails() {
   const [organization, setOrganization] = useState(null);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [membersLoading, setMembersLoading] = useState(true);
   const [error, setError] = useState("");
   const [membersError, setMembersError] = useState("");
 
+  // Fetch organization details
   useEffect(() => {
     let active = true;
 
     async function loadDetails() {
       setLoading(true);
       setError("");
-      setMembersError("");
+      setOrganization(null);
 
       try {
         const data = await getOrganizationById(id);
-        const org = data.organization ?? data;
+
+        // Backend returns:
+        // { organization: [{ id, name, city, ... }] }
+        const raw = data.organization ?? data;
+
+        const org = Array.isArray(raw) ? raw[0] : raw;
 
         if (!org || !org.id) {
-          throw new Error("Unexpected organization response");
+          throw new Error("Organization not found");
         }
 
-        if (active) setOrganization(org);
+        if (active) {
+          setOrganization(org);
+        }
       } catch (err) {
-        if (active) setError(err.message);
+        if (active) {
+          setError(err.message || "Failed to load organization");
+        }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
@@ -57,24 +67,35 @@ export default function OrganizationDetails() {
     };
   }, [id]);
 
+  // Fetch organization members
   useEffect(() => {
     let active = true;
 
     async function loadMembers() {
+      setMembersLoading(true);
       setMembers([]);
       setMembersError("");
 
       try {
         const data = await getOrganizationMembers(id);
+
         const result = Array.isArray(data) ? data : data.members;
 
         if (!Array.isArray(result)) {
           throw new Error("Unexpected members response");
         }
 
-        if (active) setMembers(result);
+        if (active) {
+          setMembers(result);
+        }
       } catch (err) {
-        if (active) setMembersError(err.message);
+        if (active) {
+          setMembersError(err.message || "Failed to load members");
+        }
+      } finally {
+        if (active) {
+          setMembersLoading(false);
+        }
       }
     }
 
@@ -85,31 +106,57 @@ export default function OrganizationDetails() {
     };
   }, [id]);
 
+  // Loading state
   if (loading) {
     return (
       <>
         <Navbar />
+
         <main className="org-detail-status">Loading organization...</main>
       </>
     );
   }
 
+  // Error state
   if (error || !organization) {
     return (
       <>
         <Navbar />
+
         <main className="org-detail-status">
           <h2>Unable to load organization</h2>
-          <p>{error}</p>
+
+          <p>{error || "Organization not found"}</p>
+
           <Link to="/organizations">Back to organizations</Link>
         </main>
       </>
     );
   }
 
-  const website = organization.website;
-  const validWebsite =
-    typeof website === "string" && /^https?:\/\//i.test(website);
+  // Normalize website URLs
+  const website = organization.website?.trim() || "";
+
+  let websiteUrl = null;
+
+  if (website) {
+    try {
+      const normalized = /^https?:\/\//i.test(website)
+        ? website
+        : `https://${website}`;
+
+      const parsed = new URL(normalized);
+
+      if (
+        ["http:", "https:"].includes(parsed.protocol) &&
+        parsed.hostname.includes(".")
+      ) {
+        websiteUrl = parsed.href;
+      }
+    } catch {
+      websiteUrl = null;
+    }
+  }
 
   return (
     <>
@@ -117,11 +164,13 @@ export default function OrganizationDetails() {
 
       <main className="org-detail-page">
         <div className="org-detail-container">
+          {/* Back navigation */}
           <Link to="/organizations" className="org-back-link">
             <ArrowLeft size={17} />
             All organizations
           </Link>
 
+          {/* Organization header */}
           <section className="org-detail-hero">
             <div className="org-detail-logo">
               <Building2 size={40} />
@@ -135,14 +184,14 @@ export default function OrganizationDetails() {
               <div className="org-detail-meta">
                 <span>
                   <MapPin size={17} />
-                  {organization.city}
+                  {organization.city || "Location not specified"}
                 </span>
               </div>
             </div>
 
-            {validWebsite && (
+            {websiteUrl && (
               <a
-                href={website}
+                href={websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="org-website-btn"
@@ -153,7 +202,9 @@ export default function OrganizationDetails() {
             )}
           </section>
 
+          {/* Organization content */}
           <div className="org-detail-grid">
+            {/* About */}
             <section className="org-detail-card">
               <h2>About this organization</h2>
 
@@ -163,11 +214,13 @@ export default function OrganizationDetails() {
               </p>
             </section>
 
+            {/* Members */}
             <section className="org-detail-card">
               <div className="org-members-heading">
                 <div>
                   <h2>Members</h2>
-                  {!membersError && (
+
+                  {!membersLoading && !membersError && (
                     <p>
                       {members.length}{" "}
                       {members.length === 1 ? "member" : "members"}
@@ -178,17 +231,22 @@ export default function OrganizationDetails() {
                 <Users size={23} />
               </div>
 
-              {membersError && (
-                <p className="org-members-error">
+              {membersLoading && (
+                <p className="org-no-members">Loading members...</p>
+              )}
+
+              {!membersLoading && membersError && (
+                <p className="org-members-error" role="alert">
                   Unable to load members: {membersError}
                 </p>
               )}
 
-              {!membersError && members.length === 0 && (
+              {!membersLoading && !membersError && members.length === 0 && (
                 <p className="org-no-members">No members to display.</p>
               )}
 
-              {!membersError &&
+              {!membersLoading &&
+                !membersError &&
                 members.map((member) => (
                   <div className="org-member" key={member.user_id ?? member.id}>
                     <div className="org-member-avatar">
@@ -199,6 +257,7 @@ export default function OrganizationDetails() {
                       <strong>
                         {member.name ?? member.user_name ?? "Member"}
                       </strong>
+
                       <span>{member.role ?? "member"}</span>
                     </div>
                   </div>
