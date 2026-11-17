@@ -1,3 +1,7 @@
+/* ==========================================
+   GOODDEED DASHBOARD
+========================================== */
+
 .dashboard-page {
   min-height: 100vh;
   background: #fafbf7;
@@ -11,6 +15,10 @@
   padding: 42px 24px 90px;
 }
 
+/* ==========================================
+   WELCOME SECTION
+========================================== */
+
 .dashboard-welcome {
   display: grid;
   grid-template-columns: 1.25fr 0.75fr;
@@ -23,9 +31,9 @@
 }
 
 .dashboard-welcome-content {
-  padding: 52px;
   position: relative;
   z-index: 1;
+  padding: 52px;
 }
 
 .dashboard-eyebrow,
@@ -54,10 +62,10 @@
 
 .dashboard-welcome p {
   max-width: 500px;
+  margin-bottom: 25px;
   color: #697d6b;
   font-size: 14px;
   line-height: 1.9;
-  margin-bottom: 25px;
 }
 
 .dashboard-primary-btn {
@@ -67,10 +75,11 @@
   padding: 14px 20px;
   border-radius: 9px;
   background: #176c3b;
-  color: white;
+  color: #fff;
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
+  transition: background 0.2s;
 }
 
 .dashboard-primary-btn:hover {
@@ -89,9 +98,9 @@
   place-items: center;
   width: 250px;
   height: 250px;
+  border: 20px solid rgba(255, 255, 255, 0.35);
   border-radius: 50%;
   background: #d5ead5;
-  border: 20px solid rgba(255, 255, 255, 0.35);
   color: #277747;
 }
 
@@ -104,7 +113,7 @@
   gap: 12px;
   padding: 13px 19px;
   border-radius: 12px;
-  background: white;
+  background: #fff;
   box-shadow: 0 12px 30px rgba(31, 75, 42, 0.1);
 }
 
@@ -127,6 +136,10 @@
   font-size: 11px;
 }
 
+/* ==========================================
+   MAIN DASHBOARD SECTIONS
+========================================== */
+
 .dashboard-section {
   margin-top: 68px;
 }
@@ -148,6 +161,10 @@
   font-size: 13px;
 }
 
+/* ==========================================
+   ACTION CARDS
+========================================== */
+
 .dashboard-actions-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -160,11 +177,11 @@
   flex-direction: column;
   min-height: 245px;
   padding: 25px;
-  background: white;
   border: 1px solid #e4ece2;
   border-radius: 15px;
-  text-decoration: none;
+  background: #fff;
   color: inherit;
+  text-decoration: none;
   transition:
     transform 0.2s,
     box-shadow 0.2s;
@@ -180,8 +197,8 @@
   place-items: center;
   width: 52px;
   height: 52px;
-  border-radius: 13px;
   margin-bottom: 22px;
+  border-radius: 13px;
 }
 
 .dashboard-action-icon.green {
@@ -232,48 +249,64 @@
   position: absolute;
   top: 23px;
   right: 17px;
-  color: #89988b;
-  background: #f0f3ef;
   padding: 5px 7px;
   border-radius: 5px;
+  background: #f0f3ef;
+  color: #89988b;
   font-size: 9px;
 }
+
+/* ==========================================
+   BOTTOM GRID
+========================================== */
 
 .dashboard-bottom-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 24px;
   margin-top: 65px;
 }
 
 .dashboard-panel {
+  min-width: 0;
   min-height: 330px;
+  height: auto;
   padding: 30px;
   border: 1px solid #e4ece2;
   border-radius: 16px;
-  background: white;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 .dashboard-panel-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
 .dashboard-panel-header > svg {
+  flex-shrink: 0;
   color: #5d8b68;
 }
 
 .dashboard-panel h2 {
+  margin: 10px 0 0;
   font-size: 22px;
 }
+
+/* ==========================================
+   EMPTY STATES
+========================================== */
 
 .dashboard-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
   padding: 25px 15px 5px;
+  text-align: center;
 }
 
 .dashboard-empty-icon {
@@ -281,35 +314,179 @@
   place-items: center;
   width: 62px;
   height: 62px;
+  margin-bottom: 17px;
   border-radius: 50%;
   background: #edf5ed;
   color: #277747;
-  margin-bottom: 17px;
 }
 
 .dashboard-empty h3 {
+  margin: 0 0 10px;
   font-family: "Manrope", sans-serif;
   font-size: 15px;
-  margin: 0 0 10px;
 }
 
 .dashboard-empty p {
   max-width: 330px;
+  color: #7b897d;
   font-size: 12px;
   line-height: 1.8;
-  color: #7b897d;
 }
 
 .dashboard-empty a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  margin-top: 12px;
   color: #176c3b;
-  text-decoration: none;
   font-size: 12px;
   font-weight: 800;
-  margin-top: 12px;
+  text-decoration: none;
 }
+
+/* ==========================================
+   MY ORGANIZATIONS
+========================================== */
+
+.dashboard-org-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-org-summary {
+  margin: 0;
+}
+
+.dashboard-org-summary p {
+  margin: 0;
+  color: #758376;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.dashboard-org-summary strong {
+  color: #176c3b;
+}
+
+.dashboard-org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-org-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e5ece3;
+  border-radius: 10px;
+  background: #fff;
+  color: #176c3b;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.dashboard-org-item:hover {
+  background: #f3f8f1;
+  border-color: #c7dfca;
+}
+
+.dashboard-org-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  border-radius: 10px;
+  background: #e4f1e4;
+  color: #176c3b;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.dashboard-org-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.dashboard-org-info strong {
+  color: #193d29;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-org-info span {
+  color: #7c8a7d;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-org-role {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #e9f4ea;
+  color: #176c3b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.dashboard-org-item > svg {
+  flex-shrink: 0;
+}
+
+/* View all organizations link */
+
+.dashboard-org-view-all {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 5px 0;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.dashboard-org-view-all:hover {
+  text-decoration: underline;
+}
+
+/* Organization loading and error states */
+
+.dashboard-org-message,
+.dashboard-org-empty {
+  color: #758376;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.dashboard-org-error {
+  color: #b42318;
+  font-size: 13px;
+}
+
+/* ==========================================
+   PROFILE BANNER
+========================================== */
 
 .dashboard-profile-banner {
   display: flex;
@@ -317,17 +494,17 @@
   gap: 20px;
   padding: 25px 30px;
   margin-top: 28px;
-  background: #edf5ec;
   border: 1px solid #dce9da;
   border-radius: 15px;
+  background: #edf5ec;
 }
 
 .dashboard-profile-icon {
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   width: 55px;
   height: 55px;
-  flex-shrink: 0;
   border-radius: 12px;
   background: #d9eada;
   color: #176c3b;
@@ -356,6 +533,10 @@
   text-decoration: none;
   white-space: nowrap;
 }
+
+/* ==========================================
+   RESPONSIVE DESIGN
+========================================== */
 
 @media (max-width: 1050px) {
   .dashboard-actions-grid {
@@ -403,6 +584,19 @@
   }
 
   .dashboard-panel {
+    padding: 22px;
+  }
+
+  .dashboard-org-item {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .dashboard-org-role {
+    padding: 5px 8px;
+  }
+
+  .dashboard-profile-banner {
     padding: 22px;
   }
 }

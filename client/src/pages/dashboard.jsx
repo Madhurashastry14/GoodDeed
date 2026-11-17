@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -16,6 +17,7 @@ import {
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
 import "../styles/dashboard.css";
+import { getMyOrganizations } from "../services/authService";
 
 const actions = [
   {
@@ -53,9 +55,60 @@ const actions = [
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, accessToken, loading: authLoading } = useAuth();
 
   const firstName = user?.name?.trim()?.split(" ")[0] || "there";
+
+  const [organizations, setOrganizations] = useState([]);
+  const [organizationsLoading, setOrganizationsLoading] = useState(true);
+  const [organizationsError, setOrganizationsError] = useState("");
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!accessToken) {
+      setOrganizationsLoading(false);
+      setOrganizationsError("Please log in to view your organizations.");
+      return;
+    }
+
+    let active = true;
+
+    async function loadOrganizations() {
+      setOrganizationsLoading(true);
+      setOrganizationsError("");
+
+      try {
+        const data = await getMyOrganizations(accessToken);
+
+        const results = Array.isArray(data)
+          ? data
+          : (data.organization ?? data.organizations);
+
+        if (!Array.isArray(results)) {
+          throw new Error("Unexpected organizations response");
+        }
+
+        if (active) {
+          setOrganizations(results);
+        }
+      } catch (err) {
+        if (active) {
+          setOrganizationsError(err.message);
+        }
+      } finally {
+        if (active) {
+          setOrganizationsLoading(false);
+        }
+      }
+    }
+
+    loadOrganizations();
+
+    return () => {
+      active = false;
+    };
+  }, [accessToken, authLoading]);
 
   return (
     <>
@@ -174,22 +227,78 @@ export default function Dashboard() {
                 <Building2 size={22} />
               </div>
 
-              <div className="dashboard-empty">
-                <div className="dashboard-empty-icon">
-                  <Users size={29} />
+              {organizationsLoading ? (
+                <div className="dashboard-empty">
+                  <p>Loading your organizations...</p>
                 </div>
+              ) : organizationsError ? (
+                <div className="dashboard-empty">
+                  <p role="alert">{organizationsError}</p>
+                </div>
+              ) : organizations.length === 0 ? (
+                <div className="dashboard-empty">
+                  <div className="dashboard-empty-icon">
+                    <Users size={29} />
+                  </div>
 
-                <h3>Find your people</h3>
+                  <h3>Find your people</h3>
 
-                <p>
-                  Explore organizations and connect with communities working
-                  toward meaningful goals.
-                </p>
+                  <p>
+                    You're not part of any organizations yet. Explore
+                    communities or create your own.
+                  </p>
 
-                <Link to="/my-organizations">
-                  My organizations <ArrowRight size={15} />
-                </Link>
-              </div>
+                  <Link to="/organizations">
+                    Explore organizations <ArrowRight size={15} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="dashboard-org-content">
+                  <div className="dashboard-org-summary">
+                    <p>
+                      You're connected with{" "}
+                      <strong>{organizations.length}</strong>{" "}
+                      {organizations.length === 1
+                        ? "organization"
+                        : "organizations"}
+                      .
+                    </p>
+                  </div>
+
+                  <div className="dashboard-org-list">
+                    {organizations.slice(0, 3).map((org) => (
+                      <Link
+                        to={`/organizations/${org.id}`}
+                        key={org.id}
+                        className="dashboard-org-item"
+                      >
+                        <div className="dashboard-org-avatar">
+                          {org.name?.charAt(0).toUpperCase() || "O"}
+                        </div>
+
+                        <div className="dashboard-org-info">
+                          <strong>{org.name}</strong>
+                          <span>{org.city}</span>
+                        </div>
+
+                        {org.role && (
+                          <span className="dashboard-org-role">{org.role}</span>
+                        )}
+
+                        <ArrowRight size={16} />
+                      </Link>
+                    ))}
+                  </div>
+
+                  <Link
+                    to="/my-organizations"
+                    className="dashboard-org-view-all"
+                  >
+                    View all organizations
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              )}
             </div>
           </section>
 

@@ -10,7 +10,7 @@ import {
   X,
   CheckCircle2,
 } from "lucide-react";
-
+import { Link } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
 import { getMyProfile, updateMyProfile } from "../services/authService";
@@ -27,6 +27,54 @@ const emptyProfile = {
 
 export default function Profile() {
   const { accessToken } = useAuth();
+
+  const [organizations, setOrganizations] = useState([]);
+  const [organizationsLoading, setOrganizationsLoading] = useState(true);
+  const [organizationsError, setOrganizationsError] = useState("");
+
+  useEffect(() => {
+    if (!accessToken) {
+      setOrganizationsLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    async function loadOrganizations() {
+      setOrganizationsLoading(true);
+      setOrganizationsError("");
+
+      try {
+        const data = await getMyOrganizations(accessToken);
+
+        const results = Array.isArray(data)
+          ? data
+          : (data.organization ?? data.organizations);
+
+        if (!Array.isArray(results)) {
+          throw new Error("Unexpected organizations response");
+        }
+
+        if (active) {
+          setOrganizations(results);
+        }
+      } catch (err) {
+        if (active) {
+          setOrganizationsError(err.message);
+        }
+      } finally {
+        if (active) {
+          setOrganizationsLoading(false);
+        }
+      }
+    }
+
+    loadOrganizations();
+
+    return () => {
+      active = false;
+    };
+  }, [accessToken]);
 
   const [profile, setProfile] = useState(emptyProfile);
   const [form, setForm] = useState(emptyProfile);
