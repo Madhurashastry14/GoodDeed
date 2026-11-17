@@ -120,3 +120,40 @@ export async function getMyOrganizations(accessToken) {
 
   return data;
 }
+
+export async function getMyProfile(accessToken) {
+  const response = await fetch("http://localhost:3000/api/users/profile", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to load profile");
+  }
+
+  return data;
+}
+
+export async function updateMyProfile(profileData, accessToken) {
+  const response = await fetch("http://localhost:3000/api/users/profile", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+    body: JSON.stringify(profileData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to update profile");
+  }
+
+  return data;
+}
