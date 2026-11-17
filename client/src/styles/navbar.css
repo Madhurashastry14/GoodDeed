@@ -1,0 +1,285 @@
+.gd-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #e7ede6;
+  font-family: "DM Sans", sans-serif;
+}
+
+.gd-nav-inner {
+  max-width: 1240px;
+  min-height: 76px;
+  margin: auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.gd-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #183b28;
+  font-family: "Manrope", sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.gd-logo-icon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  background: #176c3b;
+  color: white;
+  border-radius: 10px;
+}
+
+.gd-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.gd-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  color: #45594a;
+  text-decoration: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gd-nav-link:hover,
+.gd-nav-link.active {
+  color: #176c3b;
+}
+
+.gd-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.gd-login {
+  color: #294632;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.gd-join {
+  padding: 12px 19px;
+  border-radius: 8px;
+  background: #176c3b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.gd-join:hover {
+  background: #11552e;
+}
+
+.gd-dropdown {
+  position: relative;
+}
+
+.gd-dropdown-trigger {
+  cursor: pointer;
+}
+
+.gd-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 13px);
+  right: 0;
+  min-width: 250px;
+  padding: 8px;
+  background: white;
+  border: 1px solid #e2eae1;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(23, 55, 34, 0.12);
+  z-index: 200;
+}
+
+.gd-explore-menu {
+  left: 0;
+  right: auto;
+  min-width: 290px;
+}
+
+.gd-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #334b39;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gd-dropdown-item:hover {
+  background: #f0f7f0;
+  color: #176c3b;
+}
+
+.gd-dropdown-item svg {
+  color: #176c3b;
+  flex-shrink: 0;
+}
+
+.gd-soon {
+  margin-left: auto;
+  color: #849389;
+  background: #f1f4f0;
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.gd-avatar {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c9e4ce;
+  border-radius: 50%;
+  background: #e6f4e9;
+  color: #176c3b;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.gd-profile-menu {
+  min-width: 240px;
+}
+
+.gd-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #edf1eb;
+}
+
+.gd-profile-info strong {
+  color: #1d3a28;
+  font-size: 13px;
+}
+
+.gd-profile-info small {
+  color: #879589;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.gd-logout {
+  color: #b42318;
+}
+
+.gd-logout svg {
+  color: #b42318;
+}
+
+.gd-mobile-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #183b28;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .gd-nav-inner {
+    min-height: 68px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .gd-mobile-toggle {
+    display: grid;
+    place-items: center;
+    order: 3;
+  }
+
+  .gd-nav-links {
+    display: none;
+    order: 4;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 12px 0 20px;
+  }
+
+  .gd-nav-links.gd-nav-open {
+    display: flex;
+  }
+
+  .gd-nav-link {
+    width: 100%;
+    padding: 12px 6px;
+  }
+
+  .gd-explore-menu {
+    position: static;
+    min-width: 0;
+    margin-top: 5px;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .gd-nav-inner {
+    padding: 0 16px;
+  }
+
+  .gd-logo {
+    font-size: 19px;
+  }
+
+  .gd-nav-actions {
+    margin-left: auto;
+    gap: 12px;
+  }
+
+  .gd-login {
+    display: none;
+  }
+
+  .gd-join {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .gd-profile-menu {
+    right: -45px;
+  }
+}
