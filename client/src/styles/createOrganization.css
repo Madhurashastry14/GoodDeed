@@ -1,0 +1,289 @@
+.create-org-page {
+  min-height: 100vh;
+  padding: 45px 24px 100px;
+  background: #fafbf7;
+  font-family: "DM Sans", sans-serif;
+}
+
+.create-org-container {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.create-org-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #52705a;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.create-org-back:hover {
+  color: #176c3b;
+}
+
+.create-org-heading {
+  margin: 45px 0 35px;
+}
+
+.create-org-eyebrow {
+  color: #27804b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.create-org-heading h1 {
+  margin: 12px 0;
+  color: #193d29;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4vw, 43px);
+  letter-spacing: -1.5px;
+}
+
+.create-org-heading p {
+  max-width: 600px;
+  color: #738174;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.create-org-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.create-org-card {
+  padding: 35px;
+  border: 1px solid #e1e9df;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.create-org-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 25px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #e9eee7;
+}
+
+.create-org-card-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #e9f4ea;
+  color: #176c3b;
+}
+
+.create-org-card-heading h2 {
+  margin: 0 0 5px;
+  color: #1b3b29;
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+}
+
+.create-org-card-heading p {
+  margin: 0;
+  color: #899589;
+  font-size: 12px;
+}
+
+.create-org-field {
+  margin-bottom: 24px;
+}
+
+.create-org-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #2d4935;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-org-optional {
+  color: #98a398;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.create-org-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+  border: 1px solid #dce6da;
+  border-radius: 9px;
+  background: #fff;
+  color: #8b9a8c;
+  transition: border-color 0.2s;
+}
+
+.create-org-input-wrap:focus-within {
+  border-color: #27804b;
+}
+
+.create-org-input-wrap input,
+.create-org-input-wrap textarea {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #203b29;
+  font: inherit;
+  font-size: 13px;
+}
+
+.create-org-input-wrap input {
+  height: 49px;
+}
+
+.create-org-input-wrap textarea {
+  min-height: 125px;
+  padding: 15px 0;
+  resize: vertical;
+}
+
+.create-org-textarea-wrap {
+  align-items: flex-start;
+}
+
+.create-org-textarea-wrap svg {
+  flex-shrink: 0;
+  margin-top: 17px;
+}
+
+.create-org-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  padding-top: 22px;
+  border-top: 1px solid #e9eee7;
+}
+
+.create-org-cancel {
+  color: #718273;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.create-org-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.create-org-submit:hover:not(:disabled) {
+  background: #10562e;
+}
+
+.create-org-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.create-org-error {
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid #f5c6c1;
+  border-radius: 9px;
+  background: #fff3f2;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.create-org-info {
+  padding: 32px;
+  border: 1px solid #d9e8d7;
+  border-radius: 16px;
+  background: #eaf4e8;
+}
+
+.create-org-info-icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 25px;
+  border-radius: 15px;
+  background: #d4e9d4;
+  color: #176c3b;
+}
+
+.create-org-info h3 {
+  margin: 0 0 15px;
+  color: #193d29;
+  font-family: "Manrope", sans-serif;
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.create-org-info h4 {
+  margin: 0 0 15px;
+  color: #193d29;
+  font-size: 14px;
+}
+
+.create-org-info p {
+  margin: 0 0 15px;
+  color: #597260;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.create-org-info-divider {
+  height: 1px;
+  margin: 25px 0;
+  background: #cddfcb;
+}
+
+@media (max-width: 850px) {
+  .create-org-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 550px) {
+  .create-org-page {
+    padding: 25px 16px 60px;
+  }
+
+  .create-org-card,
+  .create-org-info {
+    padding: 22px;
+  }
+
+  .create-org-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .create-org-submit {
+    width: 100%;
+  }
+
+  .create-org-cancel {
+    text-align: center;
+  }
+}

@@ -82,3 +82,23 @@ export async function getOrganizationMembers(id) {
 
   return data;
 }
+
+export async function createOrganization(organizationData, accessToken) {
+  const response = await fetch("http://localhost:3000/api/organizations", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+    body: JSON.stringify(organizationData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to create organization");
+  }
+
+  return data;
+}

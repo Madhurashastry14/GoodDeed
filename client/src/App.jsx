@@ -6,6 +6,7 @@ import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import OrganizationDetails from "./pages/organizationDetails";
 import Organizations from "./pages/organizations";
+import CreateOrganization from "./pages/createOrganization";
 
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
@@ -30,6 +31,14 @@ export default function App() {
         />
 
         <Route path="/organizations" element={<Organizations />} />
+        <Route
+          path="/organizations/new"
+          element={
+            <ProtectedRoute>
+              <CreateOrganization />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/organizations/:id" element={<OrganizationDetails />} />
 
         <Route
