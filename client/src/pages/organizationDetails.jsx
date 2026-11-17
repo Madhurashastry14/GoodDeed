@@ -13,7 +13,7 @@ import Navbar from "../components/navbar";
 import {
   //   getOrganizationById,
   getOrganizationMembers,
-} from "../services/authService";
+} from "../services/api";
 
 import "../styles/organizationDetails.css";
 

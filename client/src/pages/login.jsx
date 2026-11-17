@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HeartHandshake, ArrowRight, Eye, EyeOff } from "lucide-react";
-import { loginUser } from "../services/authService";
+import { loginUser } from "../services/api";
 import { useAuth } from "../context/authContext";
 import "../styles/auth.css";
 

@@ -4,7 +4,7 @@ import { Building2, MapPin, Search, ArrowRight, Plus } from "lucide-react";
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
-import { getOrganizations } from "../services/authService";
+import { getOrganizations } from "../services/api";
 import "../styles/organizations.css";
 
 export default function Organizations() {

@@ -11,7 +11,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
-import { createOrganization } from "../services/authService";
+import { createOrganization } from "../services/api";
 import "../styles/createOrganization.css";
 
 export default function CreateOrganization() {

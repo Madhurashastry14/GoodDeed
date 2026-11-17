@@ -11,7 +11,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
-import { getMyOrganizations } from "../services/authService";
+import { getMyOrganizations } from "../services/api";
 import "../styles/myOrganizations.css";
 
 export default function MyOrganizations() {

@@ -9,7 +9,7 @@ import {
   Users,
   HandHeart,
 } from "lucide-react";
-import { registerUser } from "../services/authService";
+import { registerUser } from "../services/api";
 import "../styles/auth.css";
 
 export default function Register() {

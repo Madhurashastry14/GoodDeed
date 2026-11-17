@@ -13,7 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
-import { getMyProfile, updateMyProfile } from "../services/authService";
+import { getMyProfile, updateMyProfile } from "../services/api";
 
 import "../styles/profile.css";
 
