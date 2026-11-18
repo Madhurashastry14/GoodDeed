@@ -7,15 +7,23 @@ import {
   MapPin,
   Users,
   UserRound,
+  Pencil,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
-import { getOrganizationById, getOrganizationMembers } from "../services/api";
-
+import {
+  getOrganizationById,
+  getOrganizationMembers,
+  getMyOrganizations,
+} from "../services/api";
+import { useAuth } from "../context/authContext";
 import "../styles/organizationDetails.css";
 
 export default function OrganizationDetails() {
   const { id } = useParams();
+  const { accessToken, loading: authLoading } = useAuth();
+
+  const [isOwner, setIsOwner] = useState(false);
 
   const [organization, setOrganization] = useState(null);
   const [members, setMembers] = useState([]);
@@ -106,6 +114,49 @@ export default function OrganizationDetails() {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (authLoading) return;
+
+    let active = true;
+
+    async function checkOwnership() {
+      setIsOwner(false);
+
+      if (!accessToken) return;
+
+      try {
+        const data = await getMyOrganizations(accessToken);
+
+        const organizations = Array.isArray(data)
+          ? data
+          : (data.organization ?? data.organizations);
+
+        if (!Array.isArray(organizations)) {
+          throw new Error("Unexpected organizations response");
+        }
+
+        const owned = organizations.some(
+          (org) =>
+            String(org.id) === String(id) &&
+            org.role?.toLowerCase() === "owner",
+        );
+
+        if (active) {
+          setIsOwner(owned);
+        }
+      } catch (err) {
+        console.error("Unable to check organization ownership:", err);
+        if (active) setIsOwner(false);
+      }
+    }
+
+    checkOwnership();
+
+    return () => {
+      active = false;
+    };
+  }, [id, accessToken, authLoading]);
+
   // Loading state
   if (loading) {
     return (
@@ -189,17 +240,26 @@ export default function OrganizationDetails() {
               </div>
             </div>
 
-            {websiteUrl && (
-              <a
-                href={websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="org-website-btn"
-              >
-                <Globe size={17} />
-                Visit website
-              </a>
-            )}
+            <div className="org-detail-actions">
+              {websiteUrl && (
+                <a
+                  href={websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="org-website-btn"
+                >
+                  <Globe size={17} />
+                  Visit website
+                </a>
+              )}
+
+              {isOwner && (
+                <Link to={`/organizations/${id}/edit`} className="org-edit-btn">
+                  <Pencil size={16} />
+                  Edit organization
+                </Link>
+              )}
+            </div>
           </section>
 
           {/* Organization content */}

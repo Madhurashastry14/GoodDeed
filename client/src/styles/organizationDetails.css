@@ -244,3 +244,46 @@
     padding: 23px;
   }
 }
+
+/* Organization management actions */
+
+.org-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.org-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border: 1px solid #176c3b;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.org-edit-btn:hover {
+  background: #11552e;
+  border-color: #11552e;
+}
+
+@media (max-width: 750px) {
+  .org-detail-actions {
+    justify-content: flex-start;
+    width: 100%;
+    margin-left: 0;
+  }
+}
