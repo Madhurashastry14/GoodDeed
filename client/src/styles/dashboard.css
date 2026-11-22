@@ -600,3 +600,22 @@
     padding: 22px;
   }
 }
+
+.dashboard-create-opp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 20px;
+  background: #176c3b;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.dashboard-create-opp:hover {
+  background: #11552e;
+}

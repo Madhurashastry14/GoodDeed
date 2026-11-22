@@ -85,7 +85,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/items"
           element={<ComingSoon title="Free Item Sharing" />}

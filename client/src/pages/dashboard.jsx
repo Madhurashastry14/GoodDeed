@@ -133,10 +133,24 @@ export default function Dashboard() {
                 ways to connect, contribute, and support your community.
               </p>
 
-              <Link to="/organizations" className="dashboard-primary-btn">
-                Explore organizations
-                <ArrowRight size={18} />
-              </Link>
+              <div className="dashboard-welcome-actions">
+                <Link to="/organizations" className="dashboard-primary-btn">
+                  Explore organizations
+                  <ArrowRight size={18} />
+                </Link>
+
+                {organizations.some((org) =>
+                  ["owner", "admin"].includes(org.role?.toLowerCase()),
+                ) && (
+                  <Link
+                    to="/opportunities/new"
+                    className="dashboard-create-opp"
+                  >
+                    <Plus size={18} />
+                    Create Opportunity
+                  </Link>
+                )}
+              </div>
             </div>
 
             <div className="dashboard-welcome-visual">
