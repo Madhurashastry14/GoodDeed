@@ -11,12 +11,14 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useToast } from "../context/notificationContext";
 import { createOrganization } from "../services/api";
 import "../styles/createOrganization.css";
 
 export default function CreateOrganization() {
   const navigate = useNavigate();
   const { accessToken } = useAuth();
+  const toast = useToast();
 
   const [form, setForm] = useState({
     name: "",
@@ -85,6 +87,8 @@ export default function CreateOrganization() {
       // Support the backend's organization response.
       const organization = data.organization ?? data;
 
+      toast.success("Organization created successfully.");
+
       if (organization?.id) {
         navigate(`/organizations/${organization.id}`, {
           replace: true,
@@ -93,7 +97,10 @@ export default function CreateOrganization() {
         navigate("/organizations", { replace: true });
       }
     } catch (err) {
-      setError(err.message || "Failed to create organization");
+      const message = err.message || "Failed to create organization";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

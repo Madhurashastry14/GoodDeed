@@ -12,6 +12,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useConfirm, useToast } from "../context/notificationContext";
 import {
   getOrganizationById,
   getMyOrganizations,
@@ -25,6 +26,8 @@ export default function EditOrganization() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { accessToken, loading: authLoading } = useAuth();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [form, setForm] = useState({
     name: "",
@@ -162,8 +165,12 @@ export default function EditOrganization() {
       );
 
       setSuccess("Organization updated successfully.");
+      toast.success("Organization updated successfully.");
     } catch (err) {
-      setError(err.message || "Failed to update organization.");
+      const message = err.message || "Failed to update organization.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -172,9 +179,14 @@ export default function EditOrganization() {
   async function handleDelete() {
     if (!isOwner || !accessToken || deleting) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this organization? This action cannot be undone.",
-    );
+    const confirmed = await confirm({
+      title: "Delete organization?",
+      message:
+        "Are you sure you want to delete this organization? This action cannot be undone.",
+      confirmLabel: "Delete organization",
+      cancelLabel: "Keep organization",
+      tone: "danger",
+    });
 
     if (!confirmed) return;
 
@@ -183,9 +195,13 @@ export default function EditOrganization() {
 
     try {
       await deleteOrganization(id, accessToken);
+      toast.success("Organization deleted successfully.");
       navigate("/my-organizations", { replace: true });
     } catch (err) {
-      setError(err.message || "Failed to delete organization.");
+      const message = err.message || "Failed to delete organization.";
+
+      setError(message);
+      toast.error(message);
       setDeleting(false);
     }
   }

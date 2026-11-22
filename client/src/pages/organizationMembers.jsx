@@ -11,6 +11,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useConfirm, useToast } from "../context/notificationContext";
 
 import {
   getOrganizationById,
@@ -25,6 +26,8 @@ import "../styles/organizationMembers.css";
 export default function OrganizationMembers() {
   const { id } = useParams();
   const { accessToken, loading: authLoading } = useAuth();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [organization, setOrganization] = useState(null);
   const [members, setMembers] = useState([]);
@@ -142,8 +145,12 @@ export default function OrganizationMembers() {
 
       setUserId("");
       setSuccess("Member added successfully.");
+      toast.success("Member added successfully.");
     } catch (err) {
-      setError(err.message || "Unable to add member.");
+      const message = err.message || "Unable to add member.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -155,18 +162,29 @@ export default function OrganizationMembers() {
     const memberId = member.user_id ?? member.userId;
 
     if (!memberId) {
-      setError("Member user ID is missing from the API response.");
+      const message = "Member user ID is missing from the API response.";
+
+      setError(message);
+      toast.warning(message);
       return;
     }
 
     if (member.role?.toLowerCase() === "owner") {
-      setError("The organization owner cannot be removed here.");
+      const message = "The organization owner cannot be removed here.";
+
+      setError(message);
+      toast.warning(message);
       return;
     }
 
-    const confirmed = window.confirm(
-      `Remove ${member.name ?? member.user_name ?? "this member"} from the organization?`,
-    );
+    const memberName = member.name ?? member.user_name ?? "this member";
+    const confirmed = await confirm({
+      title: "Remove organization member?",
+      message: `Remove ${memberName} from the organization? They will lose access to organization management features.`,
+      confirmLabel: "Remove member",
+      cancelLabel: "Keep member",
+      tone: "danger",
+    });
 
     if (!confirmed) return;
 
@@ -179,8 +197,12 @@ export default function OrganizationMembers() {
 
       await refreshMembers();
       setSuccess("Member removed successfully.");
+      toast.success("Member removed successfully.");
     } catch (err) {
-      setError(err.message || "Unable to remove member.");
+      const message = err.message || "Unable to remove member.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setRemovingId(null);
     }
