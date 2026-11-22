@@ -4,6 +4,7 @@ const pool = require("./src/config/db");
 const authRoutes = require("./src/routes/authRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const organizationRoutes = require("./src/routes/organizationRoutes");
+const opportunityRoutes = require("./src/routes/opportunityRoutes");
 const cookieparser = require("cookie-parser");
 const app = express();
 require("dotenv").config();
@@ -36,6 +37,7 @@ app.get("/api/health", async (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/organizations", organizationRoutes);
+app.use("/api/opportunities", opportunityRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
