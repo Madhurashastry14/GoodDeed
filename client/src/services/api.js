@@ -256,6 +256,30 @@ export async function removeOrganizationMember(
   return data;
 }
 
+export async function getOrganizationOpportunities(
+  organizationId,
+  accessToken,
+) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/organization/${organizationId}`,
+    {
+      method: "GET",
+      headers: accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : undefined,
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch opportunities");
+  }
+
+  return data;
+}
+
 export async function createOpportunity(opportunityData, accessToken) {
   const response = await fetch("http://localhost:3000/api/opportunities", {
     method: "POST",

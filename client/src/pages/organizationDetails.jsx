@@ -9,6 +9,8 @@ import {
   UserRound,
   Pencil,
   Plus,
+  CalendarDays,
+  Clock,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
@@ -16,9 +18,30 @@ import {
   getOrganizationById,
   getOrganizationMembers,
   getMyOrganizations,
+  getOrganizationOpportunities,
 } from "../services/api";
 import { useAuth } from "../context/authContext";
 import "../styles/organizationDetails.css";
+
+const OPPORTUNITY_STATUSES = [
+  "draft",
+  "published",
+  "cancelled",
+  "completed",
+];
+
+function formatOpportunityDate(value) {
+  if (!value) return "Not specified";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "Not specified";
+
+  return date.toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
 
 export default function OrganizationDetails() {
   const { id } = useParams();
@@ -29,12 +52,15 @@ export default function OrganizationDetails() {
 
   const [organization, setOrganization] = useState(null);
   const [members, setMembers] = useState([]);
+  const [opportunities, setOpportunities] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [opportunitiesLoading, setOpportunitiesLoading] = useState(true);
 
   const [error, setError] = useState("");
   const [membersError, setMembersError] = useState("");
+  const [opportunitiesError, setOpportunitiesError] = useState("");
 
   // Fetch organization details
   useEffect(() => {
@@ -114,6 +140,47 @@ export default function OrganizationDetails() {
       active = false;
     };
   }, [id]);
+
+  // Fetch organization opportunities (published, plus drafts for owners/admins)
+  useEffect(() => {
+    if (authLoading) return;
+
+    let active = true;
+
+    async function loadOpportunities() {
+      setOpportunitiesLoading(true);
+      setOpportunities([]);
+      setOpportunitiesError("");
+
+      try {
+        const data = await getOrganizationOpportunities(id, accessToken);
+
+        const result = Array.isArray(data) ? data : data.opportunities;
+
+        if (!Array.isArray(result)) {
+          throw new Error("Unexpected opportunities response");
+        }
+
+        if (active) {
+          setOpportunities(result);
+        }
+      } catch (err) {
+        if (active) {
+          setOpportunitiesError(err.message || "Failed to load opportunities");
+        }
+      } finally {
+        if (active) {
+          setOpportunitiesLoading(false);
+        }
+      }
+    }
+
+    loadOpportunities();
+
+    return () => {
+      active = false;
+    };
+  }, [id, accessToken, authLoading]);
 
   // Check the logged-in user's organization role
   useEffect(() => {
@@ -355,6 +422,108 @@ export default function OrganizationDetails() {
                 ))}
             </section>
           </div>
+
+          {/* Opportunities */}
+          <section className="org-opportunities-section">
+            <div className="org-opportunities-heading">
+              <div>
+                <h2>Opportunities</h2>
+
+                {!opportunitiesLoading && !opportunitiesError && (
+                  <p>
+                    {opportunities.length}{" "}
+                    {opportunities.length === 1
+                      ? "opportunity"
+                      : "opportunities"}
+                  </p>
+                )}
+              </div>
+
+              <CalendarDays size={23} />
+            </div>
+
+            {opportunitiesLoading && (
+              <p className="org-opportunities-state">
+                Loading opportunities...
+              </p>
+            )}
+
+            {!opportunitiesLoading && opportunitiesError && (
+              <p
+                className="org-opportunities-state org-opportunities-error"
+                role="alert"
+              >
+                Unable to load opportunities: {opportunitiesError}
+              </p>
+            )}
+
+            {!opportunitiesLoading &&
+              !opportunitiesError &&
+              opportunities.length === 0 && (
+                <p className="org-opportunities-state">
+                  No opportunities available yet
+                </p>
+              )}
+
+            {!opportunitiesLoading &&
+              !opportunitiesError &&
+              opportunities.length > 0 && (
+                <div className="org-opportunities-grid">
+                  {opportunities.map((opportunity) => {
+                    const status = String(
+                      opportunity.status || "draft",
+                    ).toLowerCase();
+
+                    return (
+                      <article className="org-opp-card" key={opportunity.id}>
+                        <div className="org-opp-card-head">
+                          <h3>{opportunity.title || "Untitled opportunity"}</h3>
+
+                          <span
+                            className={`org-opp-status org-opp-status--${
+                              OPPORTUNITY_STATUSES.includes(status)
+                                ? status
+                                : "default"
+                            }`}
+                          >
+                            {status}
+                          </span>
+                        </div>
+
+                        <p className="org-opp-description">
+                          {opportunity.description ||
+                            "No description provided."}
+                        </p>
+
+                        <div className="org-opp-meta">
+                          <span>
+                            <MapPin size={15} />
+                            {opportunity.city || "Location not specified"}
+                          </span>
+
+                          <span>
+                            <Users size={15} />
+                            Volunteer capacity:{" "}
+                            {opportunity.capacity ?? "Not specified"}
+                          </span>
+
+                          <span>
+                            <CalendarDays size={15} />
+                            Starts:{" "}
+                            {formatOpportunityDate(opportunity.starts_at)}
+                          </span>
+
+                          <span>
+                            <Clock size={15} />
+                            Ends: {formatOpportunityDate(opportunity.ends_at)}
+                          </span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+          </section>
         </div>
       </main>
     </>

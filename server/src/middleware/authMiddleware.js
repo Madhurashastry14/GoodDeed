@@ -36,7 +36,8 @@ function optionalAuthMiddleware(req, res, next) {
   const token = authHeader.slice(7);
 
   try {
-    req.user = verifyAccessToken(token);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: decoded.userId };
     next();
   } catch (error) {
     return res.status(401).json({
