@@ -14,6 +14,8 @@ import OrganizationMembers from "./pages/organizationMembers";
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
+import CreateOpportunity from "./pages/createOpportunity";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -75,11 +77,15 @@ export default function App() {
           }
         />
 
-        {/* Planned backend features */}
         <Route
-          path="/opportunities"
-          element={<ComingSoon title="Volunteer Opportunities" />}
+          path="/opportunities/new"
+          element={
+            <ProtectedRoute>
+              <CreateOpportunity />
+            </ProtectedRoute>
+          }
         />
+
         <Route
           path="/items"
           element={<ComingSoon title="Free Item Sharing" />}

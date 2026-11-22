@@ -255,3 +255,23 @@ export async function removeOrganizationMember(
 
   return data;
 }
+
+export async function createOpportunity(opportunityData, accessToken) {
+  const response = await fetch("http://localhost:3000/api/opportunities", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    credentials: "include",
+    body: JSON.stringify(opportunityData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to create opportunity");
+  }
+
+  return data;
+}

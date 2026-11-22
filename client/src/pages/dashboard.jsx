@@ -12,6 +12,7 @@ import {
   MapPin,
   Sparkles,
   ClipboardList,
+  Plus,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
