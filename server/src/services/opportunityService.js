@@ -121,7 +121,8 @@ async function getOrganizationOpportunities(organizationId, userId = null) {
        ends_at,
        capacity,
        status,
-       created_at
+       created_at,
+       (ends_at <= NOW()) AS can_complete
      FROM opportunities
      WHERE organization_id = $1
        AND ($2::boolean = TRUE OR status = 'published')
@@ -153,6 +154,7 @@ async function getOpportunityById(opportunityId, userId = null) {
        o.created_by,
        o.created_at,
        o.updated_at,
+       (o.ends_at <= NOW()) AS can_complete,
        org.name AS organization_name,
        org.city AS organization_city,
        COALESCE(
@@ -390,10 +392,217 @@ async function publishOpportunity(opportunityId, userId) {
   }
 }
 
+async function cancelOpportunity(opportunityId, userId) {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      "SELECT * FROM opportunities WHERE id = $1 FOR UPDATE",
+      [opportunityId],
+    );
+
+    if (result.rows.length === 0) {
+      throw httpError(404, "Opportunity not found");
+    }
+
+    const opportunity = result.rows[0];
+
+    const membership = await client.query(
+      `SELECT role
+       FROM organization_members
+       WHERE organization_id = $1 AND user_id = $2`,
+      [opportunity.organization_id, userId],
+    );
+
+    if (membership.rows[0]?.role !== "owner") {
+      throw httpError(
+        403,
+        "Only the organization owner can cancel opportunities",
+      );
+    }
+
+    if (!["draft", "published"].includes(opportunity.status)) {
+      throw httpError(
+        409,
+        "Only draft or published opportunities can be cancelled",
+      );
+    }
+
+    const updated = await client.query(
+      `UPDATE opportunities
+       SET status = 'cancelled', updated_at = NOW()
+       WHERE id = $1
+       RETURNING
+         id,
+         organization_id,
+         title,
+         description,
+         city,
+         starts_at,
+         ends_at,
+         capacity,
+         status,
+         created_by,
+         created_at,
+         updated_at`,
+      [opportunityId],
+    );
+
+    await client.query("COMMIT");
+
+    return updated.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+async function completeOpportunity(opportunityId, userId) {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      "SELECT * FROM opportunities WHERE id = $1 FOR UPDATE",
+      [opportunityId],
+    );
+
+    if (result.rows.length === 0) {
+      throw httpError(404, "Opportunity not found");
+    }
+
+    const opportunity = result.rows[0];
+
+    const membership = await client.query(
+      `SELECT role
+       FROM organization_members
+       WHERE organization_id = $1 AND user_id = $2`,
+      [opportunity.organization_id, userId],
+    );
+
+    if (membership.rows[0]?.role !== "owner") {
+      throw httpError(
+        403,
+        "Only the organization owner can complete opportunities",
+      );
+    }
+
+    if (opportunity.status !== "published") {
+      throw httpError(409, "Only published opportunities can be completed");
+    }
+
+    if (new Date(opportunity.ends_at) > new Date()) {
+      throw httpError(
+        409,
+        "The scheduled end time must have passed before completing",
+      );
+    }
+
+    const updated = await client.query(
+      `UPDATE opportunities
+       SET status = 'completed', updated_at = NOW()
+       WHERE id = $1
+       RETURNING
+         id,
+         organization_id,
+         title,
+         description,
+         city,
+         starts_at,
+         ends_at,
+         capacity,
+         status,
+         created_by,
+         created_at,
+         updated_at`,
+      [opportunityId],
+    );
+
+    await client.query("COMMIT");
+
+    return updated.rows[0];
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+async function deleteOpportunity(opportunityId, userId) {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      "SELECT * FROM opportunities WHERE id = $1 FOR UPDATE",
+      [opportunityId],
+    );
+
+    if (result.rows.length === 0) {
+      throw httpError(404, "Opportunity not found");
+    }
+
+    const opportunity = result.rows[0];
+
+    const membership = await client.query(
+      `SELECT role
+       FROM organization_members
+       WHERE organization_id = $1 AND user_id = $2`,
+      [opportunity.organization_id, userId],
+    );
+
+    if (membership.rows[0]?.role !== "owner") {
+      throw httpError(
+        403,
+        "Only the organization owner can delete opportunities",
+      );
+    }
+
+    if (opportunity.status !== "draft") {
+      throw httpError(409, "Only draft opportunities can be deleted");
+    }
+
+    const applications = await client.query(
+      "SELECT 1 FROM applications WHERE opportunity_id = $1 LIMIT 1",
+      [opportunityId],
+    );
+
+    if (applications.rows.length > 0) {
+      throw httpError(
+        409,
+        "Cannot delete an opportunity that has volunteer applications",
+      );
+    }
+
+    await client.query("DELETE FROM opportunities WHERE id = $1", [
+      opportunityId,
+    ]);
+
+    await client.query("COMMIT");
+
+    return true;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   createOpportunity,
   getOrganizationOpportunities,
   getOpportunityById,
   updateOpportunity,
   publishOpportunity,
+  cancelOpportunity,
+  completeOpportunity,
+  deleteOpportunity,
 };

@@ -23,6 +23,18 @@ router.patch(
   opportunityController.publishOpportunity,
 );
 
+router.patch(
+  "/:id/cancel",
+  Middleware.authMiddleware,
+  opportunityController.cancelOpportunity,
+);
+
+router.patch(
+  "/:id/complete",
+  Middleware.authMiddleware,
+  opportunityController.completeOpportunity,
+);
+
 router.get(
   "/:id",
   Middleware.optionalAuthMiddleware,
@@ -33,6 +45,12 @@ router.patch(
   "/:id",
   Middleware.authMiddleware,
   opportunityController.patchOpportunity,
+);
+
+router.delete(
+  "/:id",
+  Middleware.authMiddleware,
+  opportunityController.deleteOpportunity,
 );
 
 module.exports = router;

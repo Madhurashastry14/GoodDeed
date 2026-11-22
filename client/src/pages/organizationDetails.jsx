@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
+import OpportunityOwnerActions from "../components/opportunityOwnerActions";
 import {
   getOrganizationById,
   getOrganizationMembers,
@@ -536,16 +537,29 @@ export default function OrganizationDetails() {
                             View details
                           </Link>
 
-                          {isOwner &&
-                            ["draft", "published"].includes(status) && (
-                              <Link
-                                to={`/opportunities/${opportunity.id}/edit`}
-                                className="org-opp-edit-link"
-                              >
-                                <Pencil size={14} />
-                                Edit
-                              </Link>
-                            )}
+                          {isOwner && (
+                            <OpportunityOwnerActions
+                              opportunity={opportunity}
+                              accessToken={accessToken}
+                              compact
+                              onUpdated={(updated) =>
+                                setOpportunities((previous) =>
+                                  previous.map((item) =>
+                                    item.id === updated.id
+                                      ? { ...item, ...updated }
+                                      : item,
+                                  ),
+                                )
+                              }
+                              onDeleted={(deleted) =>
+                                setOpportunities((previous) =>
+                                  previous.filter(
+                                    (item) => item.id !== deleted.id,
+                                  ),
+                                )
+                              }
+                            />
+                          )}
                         </div>
                       </article>
                     );

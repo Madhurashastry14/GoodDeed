@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
   CalendarDays,
   Clock,
   MapPin,
-  Pencil,
   Users,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
+import OpportunityOwnerActions from "../components/opportunityOwnerActions";
 import { useAuth } from "../context/authContext";
 import { getOpportunityById } from "../services/api";
 import "../styles/opportunityDetails.css";
@@ -33,6 +38,7 @@ function formatDateTime(value) {
 export default function OpportunityDetails() {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { accessToken, loading: authLoading } = useAuth();
 
   const [opportunity, setOpportunity] = useState(null);
@@ -105,9 +111,6 @@ export default function OpportunityDetails() {
     ? opportunity.status
     : "draft";
 
-  const canEdit =
-    opportunity.is_owner && ["draft", "published"].includes(status);
-
   const capacity = opportunity.capacity;
   const accepted = Number(opportunity.accepted_count) || 0;
   const remaining = capacity === null ? null : Math.max(capacity - accepted, 0);
@@ -162,15 +165,28 @@ export default function OpportunityDetails() {
               </div>
             </div>
 
-            {canEdit && (
+            {opportunity.is_owner && (
               <div className="opp-detail-actions">
-                <Link
-                  to={`/opportunities/${opportunity.id}/edit`}
-                  className="opp-detail-edit-btn"
-                >
-                  <Pencil size={16} />
-                  Edit opportunity
-                </Link>
+                <OpportunityOwnerActions
+                  opportunity={opportunity}
+                  accessToken={accessToken}
+                  onUpdated={(updated) =>
+                    setOpportunity((previous) => ({
+                      ...previous,
+                      ...updated,
+                    }))
+                  }
+                  onDeleted={() =>
+                    navigate(
+                      `/organizations/${opportunity.organization_id}`,
+                      {
+                        state: {
+                          message: "Draft opportunity deleted.",
+                        },
+                      },
+                    )
+                  }
+                />
               </div>
             )}
           </section>

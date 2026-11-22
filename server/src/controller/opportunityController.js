@@ -318,10 +318,97 @@ async function publishOpportunity(req, res) {
   }
 }
 
+async function cancelOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    const opportunity = await opportunityService.cancelOpportunity(
+      id,
+      req.user.id,
+    );
+
+    return res.status(200).json({
+      message: "Opportunity cancelled successfully",
+      opportunity,
+    });
+  } catch (error) {
+    console.error("Cancel opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to cancel opportunity",
+    });
+  }
+}
+
+async function completeOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    const opportunity = await opportunityService.completeOpportunity(
+      id,
+      req.user.id,
+    );
+
+    return res.status(200).json({
+      message: "Opportunity completed successfully",
+      opportunity,
+    });
+  } catch (error) {
+    console.error("Complete opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to complete opportunity",
+    });
+  }
+}
+
+async function deleteOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    await opportunityService.deleteOpportunity(id, req.user.id);
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Delete opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to delete opportunity",
+    });
+  }
+}
+
 module.exports = {
   createOpportunity,
   getOrganizationOpportunities,
   getOpportunity,
   patchOpportunity,
   publishOpportunity,
+  cancelOpportunity,
+  completeOpportunity,
+  deleteOpportunity,
 };

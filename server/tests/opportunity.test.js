@@ -63,6 +63,38 @@ function futureIso(hoursFromNow) {
   return new Date(Date.now() + hoursFromNow * 60 * 60 * 1000).toISOString();
 }
 
+async function insertOpportunity({
+  title,
+  status = "draft",
+  startHours = 24,
+  endHours = 28,
+  capacity = 5,
+} = {}) {
+  const id = randomUUID();
+
+  await pool.query(
+    `INSERT INTO opportunities (
+       id, organization_id, title, description, city,
+       starts_at, ends_at, capacity, status, created_by
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    [
+      id,
+      organizationId,
+      title || `Fixture ${id}`,
+      "Fixture description",
+      "Test City",
+      futureIso(startHours),
+      futureIso(endHours),
+      capacity,
+      status,
+      owner,
+    ],
+  );
+
+  return id;
+}
+
 before(async () => {
   const health = await fetch(`${API_URL}/health`);
 
@@ -272,4 +304,177 @@ test("PATCH cannot change status", async () => {
   });
 
   assert.equal(response.status, 400);
+});
+
+test("admin cannot publish an opportunity", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/publish`,
+    {
+      method: "PATCH",
+      token: tokenFor(admin),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
+
+test("owner can publish a draft opportunity", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/publish`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 200, JSON.stringify(response.data));
+  assert.equal(response.data.opportunity.status, "published");
+});
+
+test("published opportunity is visible to the public", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`);
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunity.status, "published");
+  assert.equal(response.data.opportunity.is_owner, false);
+});
+
+test("publishing a published opportunity is rejected", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/publish`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 409);
+});
+
+test("publishing a draft whose start time has passed is rejected", async () => {
+  const pastDraftId = await insertOpportunity({
+    status: "draft",
+    startHours: -4,
+    endHours: 4,
+  });
+
+  const response = await api(`/opportunities/${pastDraftId}/publish`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 409);
+});
+
+test("admin cannot cancel an opportunity", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/cancel`,
+    {
+      method: "PATCH",
+      token: tokenFor(admin),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
+
+test("owner can cancel a published opportunity", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/cancel`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunity.status, "cancelled");
+});
+
+test("cancelled opportunity is hidden from the public", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`);
+
+  assert.equal(response.status, 404);
+});
+
+test("cancelling a cancelled opportunity is rejected", async () => {
+  const response = await api(
+    `/opportunities/${draftOpportunityId}/cancel`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 409);
+});
+
+test("completing a future published opportunity is rejected", async () => {
+  const futureId = await insertOpportunity({
+    status: "published",
+    startHours: 4,
+    endHours: 8,
+  });
+
+  const response = await api(`/opportunities/${futureId}/complete`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 409);
+});
+
+test("owner can complete a published opportunity after it ends", async () => {
+  const pastId = await insertOpportunity({
+    status: "published",
+    startHours: -8,
+    endHours: -4,
+  });
+
+  const response = await api(`/opportunities/${pastId}/complete`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunity.status, "completed");
+});
+
+test("non-draft opportunities cannot be deleted", async () => {
+  const publishedId = await insertOpportunity({ status: "published" });
+
+  const response = await api(`/opportunities/${publishedId}`, {
+    method: "DELETE",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 409);
+});
+
+test("admin cannot delete a draft opportunity", async () => {
+  const draftId = await insertOpportunity({ status: "draft" });
+
+  const response = await api(`/opportunities/${draftId}`, {
+    method: "DELETE",
+    token: tokenFor(admin),
+  });
+
+  assert.equal(response.status, 403);
+});
+
+test("owner can delete a draft opportunity", async () => {
+  const draftId = await insertOpportunity({ status: "draft" });
+
+  const deleted = await api(`/opportunities/${draftId}`, {
+    method: "DELETE",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(deleted.status, 204);
+
+  const response = await api(`/opportunities/${draftId}`, {
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 404);
 });

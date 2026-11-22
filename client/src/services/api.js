@@ -349,6 +349,71 @@ export async function publishOpportunity(opportunityId, accessToken) {
   return data;
 }
 
+export async function cancelOpportunity(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}/cancel`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to cancel opportunity");
+  }
+
+  return data;
+}
+
+export async function completeOpportunity(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}/complete`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to complete opportunity");
+  }
+
+  return data;
+}
+
+export async function deleteOpportunity(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  // DELETE returns 204 No Content on success.
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    throw new Error(data?.error || "Failed to delete opportunity");
+  }
+
+  return data;
+}
+
 export async function createOpportunity(opportunityData, accessToken) {
   const response = await fetch("http://localhost:3000/api/opportunities", {
     method: "POST",

@@ -1,0 +1,66 @@
+.opp-owner-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.opp-owner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid #cfe0cd;
+  border-radius: 8px;
+  background: #fff;
+  color: #176c3b;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opp-owner-btn:hover {
+  background: #f0f7ef;
+}
+
+.opp-owner-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.opp-owner-btn-primary {
+  border-color: #176c3b;
+  background: #176c3b;
+  color: #fff;
+}
+
+.opp-owner-btn-primary:hover {
+  background: #11552e;
+}
+
+.opp-owner-btn-danger {
+  border-color: #f0c9c5;
+  background: #fff;
+  color: #b42318;
+}
+
+.opp-owner-btn-danger:hover {
+  background: #fff1f0;
+}
+
+.opp-owner-actions-compact .opp-owner-btn {
+  padding: 7px 11px;
+  font-size: 11px;
+}
+
+.opp-owner-error {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  color: #b42318;
+  font-size: 12px;
+  line-height: 1.6;
+}
