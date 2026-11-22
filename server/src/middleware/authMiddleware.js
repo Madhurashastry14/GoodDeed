@@ -19,4 +19,30 @@ function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = authMiddleware;
+function optionalAuthMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  // Public visitors can continue without a token
+  if (!authHeader) {
+    return next();
+  }
+
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "Invalid authorization header",
+    });
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: decoded.userId };
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      error: "Invalid or expired access token",
+    });
+  }
+}
+module.exports = { authMiddleware, optionalAuthMiddleware };

@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  HeartHandshake,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Heart,
-  Users,
-  HandHeart,
-} from "lucide-react";
+import { HeartHandshake, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { registerUser } from "../services/api";
+import { useToast } from "../context/notificationContext";
 import "../styles/auth.css";
 
 export default function Register() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [form, setForm] = useState({
     name: "",
@@ -63,6 +57,7 @@ export default function Register() {
         password: form.password,
       });
 
+      toast.success("Account created successfully. Please log in.");
       navigate("/login", {
         replace: true,
         state: {
@@ -70,7 +65,10 @@ export default function Register() {
         },
       });
     } catch (err) {
-      setError(err.message || "Registration failed.");
+      const message = err.message || "Registration failed.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

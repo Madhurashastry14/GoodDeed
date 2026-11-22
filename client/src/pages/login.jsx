@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HeartHandshake, ArrowRight, Eye, EyeOff } from "lucide-react";
-import { loginUser } from "../services/api";
 import { useAuth } from "../context/authContext";
+import { useToast } from "../context/notificationContext";
 import "../styles/auth.css";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   const [form, setForm] = useState({
     email: "",
@@ -36,11 +37,15 @@ export default function Login() {
     try {
       await login(form.email.trim().toLowerCase(), form.password);
 
+      toast.success("Logged in successfully.");
       navigate(location.state?.from || "/dashboard", {
         replace: true,
       });
     } catch (err) {
-      setError(err.message || "Unable to log in.");
+      const message = err.message || "Unable to log in.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

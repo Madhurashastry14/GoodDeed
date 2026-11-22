@@ -307,3 +307,200 @@
 .org-create-opp-btn:hover {
   background: #11552e;
 }
+
+/* Organization opportunities */
+
+.org-opportunities-section {
+  margin-top: 30px;
+  padding: 32px;
+  background: white;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.org-opportunities-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: #176c3b;
+  margin-bottom: 20px;
+}
+
+.org-opportunities-heading h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  letter-spacing: -0.5px;
+  color: #193d29;
+  margin: 0 0 7px;
+}
+
+.org-opportunities-heading p {
+  color: #819083;
+  font-size: 12px;
+  margin: 0;
+}
+
+.org-opportunities-state {
+  color: #7b8c7e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.org-opportunities-error {
+  color: #b42318;
+}
+
+.org-opportunities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.org-opp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  background: #fbfdf9;
+  border: 1px solid #e8efe7;
+  border-radius: 12px;
+}
+
+.org-opp-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.org-opp-card-head h3 {
+  font-family: "Manrope", sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  color: #193d29;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.org-opp-status {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.org-opp-status--draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.org-opp-status--published {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.org-opp-status--cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.org-opp-status--completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.org-opp-description {
+  color: #697b6d;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.org-opp-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #edf1ec;
+  color: #687e6c;
+  font-size: 12px;
+}
+
+.org-opp-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  overflow-wrap: anywhere;
+}
+
+.org-opp-meta svg {
+  flex-shrink: 0;
+  color: #477a55;
+}
+
+.org-opp-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1ec;
+}
+
+.org-opp-view-link {
+  color: #176c3b;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.org-opp-view-link:hover {
+  text-decoration: underline;
+}
+
+.org-opp-edit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #cfe0cd;
+  border-radius: 8px;
+  background: #fff;
+  color: #176c3b;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.org-opp-edit-link:hover {
+  background: #f0f7ef;
+}
+
+.org-detail-notice {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .org-opportunities-section {
+    padding: 23px;
+  }
+
+  .org-opportunities-grid {
+    grid-template-columns: 1fr;
+  }
+}

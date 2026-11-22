@@ -1,0 +1,524 @@
+.opp-detail-page {
+  min-height: 100vh;
+  background: #fafbf7;
+  color: #193d29;
+  font-family: "DM Sans", sans-serif;
+}
+
+.opp-detail-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px 24px 90px;
+}
+
+.opp-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #477a55;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.opp-detail-back:hover {
+  color: #176c3b;
+}
+
+.opp-detail-notice {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-detail-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+  padding: 40px;
+  background: linear-gradient(120deg, #e9f4e8, #f3f8ee);
+  border: 1px solid #dfebdd;
+  border-radius: 20px;
+}
+
+.opp-detail-hero-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.opp-detail-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.opp-detail-eyebrow {
+  color: #287a46;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.opp-detail-status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.opp-detail-status-badge.status-draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.opp-detail-status-badge.status-published {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.opp-detail-status-badge.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.opp-detail-status-badge.status-completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.opp-detail-hero h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -1.3px;
+  margin: 14px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.opp-detail-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #176c3b;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.opp-detail-org:hover {
+  text-decoration: underline;
+}
+
+.opp-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #687e6c;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.opp-detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.opp-detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.opp-detail-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.opp-detail-edit-btn:hover {
+  background: #11552e;
+}
+
+.opp-detail-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.opp-detail-card {
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.opp-detail-card h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  letter-spacing: -0.5px;
+  margin: 0 0 20px;
+}
+
+.opp-detail-description {
+  color: #697b6d;
+  font-size: 14px;
+  line-height: 2;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.opp-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.opp-detail-info > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #176c3b;
+}
+
+.opp-detail-info > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.opp-detail-info span {
+  color: #819083;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.opp-detail-info strong {
+  color: #25432e;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.opp-detail-status {
+  padding: 90px 24px;
+  text-align: center;
+  color: #667b6b;
+}
+
+.opp-detail-status h2 {
+  color: #193d29;
+}
+
+.opp-detail-status a {
+  color: #176c3b;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .opp-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .opp-detail-hero {
+    flex-wrap: wrap;
+  }
+}
+
+.opp-action-card {
+  margin-top: 30px;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.opp-action-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+  color: #176c3b;
+}
+
+.opp-action-heading h2 {
+  margin: 4px 0 0;
+  color: #193d29;
+  font-family: "Manrope", sans-serif;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.opp-action-text {
+  margin: 0;
+  color: #697b6d;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.opp-action-link {
+  color: #176c3b;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.opp-action-link:hover {
+  text-decoration: underline;
+}
+
+.opp-action-success {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-action-error {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #ffd5d2;
+  border-radius: 9px;
+  background: #fff1f0;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-apply-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.opp-apply-btn,
+.opp-secondary-btn {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opp-apply-btn:hover,
+.opp-secondary-btn:hover {
+  background: #11552e;
+}
+
+.opp-apply-btn:disabled,
+.opp-secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.opp-secondary-btn {
+  margin-top: 14px;
+  border: 1px solid #cfe0cd;
+  background: #fff;
+  color: #176c3b;
+}
+
+.opp-secondary-btn:hover {
+  background: #f0f7ef;
+}
+
+.opp-my-application p {
+  margin: 0 0 8px;
+  color: #697b6d;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.opp-app-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ec;
+  color: #5f7263;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.opp-app-status.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.opp-app-status.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.opp-app-status.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.opp-app-status.status-withdrawn {
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.opp-app-status.status-waitlisted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.opp-applicants-summary {
+  margin: 0 0 18px;
+  color: #56715d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.opp-applicant-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.opp-applicant-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #edf1ec;
+}
+
+.opp-applicant-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.opp-applicant-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e8f3e9;
+  color: #176c3b;
+}
+
+.opp-applicant-person > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.opp-applicant-person strong {
+  color: #25432e;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.opp-applicant-person span {
+  color: #819083;
+  font-size: 11px;
+}
+
+.opp-applicant-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.opp-app-accept,
+.opp-app-reject {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid #cfe0cd;
+  border-radius: 8px;
+  background: #fff;
+  color: #176c3b;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opp-app-accept:hover {
+  background: #f0f7ef;
+}
+
+.opp-app-reject {
+  border-color: #f0c9c5;
+  color: #b42318;
+}
+
+.opp-app-reject:hover {
+  background: #fff1f0;
+}
+
+.opp-app-accept:disabled,
+.opp-app-reject:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .opp-detail-container {
+    padding: 25px 16px 60px;
+  }
+
+  .opp-detail-hero {
+    padding: 25px;
+  }
+
+  .opp-detail-card,
+  .opp-action-card {
+    padding: 23px;
+  }
+
+  .opp-applicant-row {
+    flex-wrap: wrap;
+  }
+
+  .opp-applicant-actions {
+    width: 100%;
+  }
+}

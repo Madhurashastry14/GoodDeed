@@ -15,6 +15,10 @@ import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
 import CreateOpportunity from "./pages/createOpportunity";
+import Opportunities from "./pages/opportunities";
+import OpportunityDetails from "./pages/opportunityDetails";
+import EditOpportunity from "./pages/editOpportunity";
+import MyActivities from "./pages/myActivities";
 
 export default function App() {
   return (
@@ -85,6 +89,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/opportunities" element={<Opportunities />} />
+        <Route path="/opportunities/:id" element={<OpportunityDetails />} />
+        <Route
+          path="/opportunities/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditOpportunity />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/items"
           element={<ComingSoon title="Free Item Sharing" />}
@@ -106,7 +120,7 @@ export default function App() {
           path="/my-activities"
           element={
             <ProtectedRoute>
-              <ComingSoon title="My Activities" />
+              <MyActivities />
             </ProtectedRoute>
           }
         />

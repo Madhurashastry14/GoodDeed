@@ -88,36 +88,50 @@ Sensitive account information must not be exposed through public profile endpoin
 
 ## 7. Volunteer Opportunities
 
-**Status: Planned unless already implemented.**
+**Status: Implemented.**
 
-| Method | Endpoint                           | Access                   | Description                          |
-| ------ | ---------------------------------- | ------------------------ | ------------------------------------ |
-| GET    | `/opportunities`                   | Public                   | Discover published opportunities     |
-| GET    | `/opportunities/:id`               | Public                   | View opportunity details             |
-| POST   | `/organizations/:id/opportunities` | Organization owner/admin | Create an opportunity                |
-| PATCH  | `/opportunities/:id`               | Organization owner/admin | Update an opportunity                |
-| DELETE | `/opportunities/:id`               | Organization owner/admin | Cancel or remove an opportunity      |
-| GET    | `/organizations/:id/opportunities` | Public                   | List an organization's opportunities |
+| Method | Endpoint                                 | Access          | Description                                       |
+| ------ | ---------------------------------------- | --------------- | ------------------------------------------------- |
+| GET    | `/opportunities`                         | Public          | Discover published opportunities                  |
+| GET    | `/opportunities/:id`                     | Public / owner  | View details; drafts are owner-only               |
+| GET    | `/opportunities/organization/:id`        | Public / owner  | List an organization's opportunities              |
+| POST   | `/opportunities`                         | Owner           | Create an opportunity as a draft                  |
+| PATCH  | `/opportunities/:id`                     | Owner           | Edit a draft or published opportunity             |
+| PATCH  | `/opportunities/:id/publish`             | Owner           | Publish a draft                                   |
+| PATCH  | `/opportunities/:id/cancel`              | Owner           | Cancel a draft or published opportunity           |
+| PATCH  | `/opportunities/:id/complete`            | Owner           | Complete a published opportunity after it ends    |
+| DELETE | `/opportunities/:id`                     | Owner           | Delete a draft opportunity                        |
 
-Opportunity information may include title, description, location, schedule, capacity, required skills, and status.
+Only the organization **owner** can manage opportunities. Organization admins and members cannot create, edit, publish, cancel, complete, delete, or view draft opportunities.
 
-Only authorized organization members should manage opportunities belonging to their organization.
+Lifecycle: `draft → published → completed`, plus `draft → cancelled` and `published → cancelled`. Completed and cancelled opportunities are read-only. Publishing requires a future start time.
+
+`GET /opportunities` accepts optional query parameters:
+
+- `search` — matches opportunity title, description, or organization name.
+- `city` — case-insensitive exact city match.
+- `upcoming=true` — only opportunities that have not started.
+- `sort=start_asc|start_desc` — defaults to `start_asc`.
+- `page` and `limit` — pagination; `limit` is 1–50 and defaults to 9.
+
+The public listing returns only `published` opportunities. Drafts, cancelled opportunities, and completed opportunities are never returned publicly.
 
 ## 8. Volunteer Applications
 
-**Status: Planned unless already implemented.**
+**Status: Implemented.**
 
-| Method | Endpoint                          | Access                   | Description                              |
-| ------ | --------------------------------- | ------------------------ | ---------------------------------------- |
-| POST   | `/opportunities/:id/applications` | Authenticated            | Apply for an opportunity                 |
-| GET    | `/applications/mine`              | Authenticated            | View the current user's applications     |
-| GET    | `/opportunities/:id/applications` | Organization owner/admin | View applications                        |
-| PATCH  | `/applications/:id/status`        | Organization owner/admin | Accept, reject, or waitlist an applicant |
-| DELETE | `/applications/:id`               | Application owner        | Withdraw an application                  |
+| Method | Endpoint                                       | Access     | Description                              |
+| ------ | ---------------------------------------------- | ---------- | ---------------------------------------- |
+| POST   | `/opportunities/:id/applications`              | Auth       | Apply for a published opportunity        |
+| GET    | `/opportunity-applications/mine`               | Auth       | View the current user's applications     |
+| GET    | `/opportunities/:id/applications`              | Owner      | View applicants and capacity summary     |
+| PATCH  | `/opportunity-applications/:id/accept`         | Owner      | Accept a pending application             |
+| PATCH  | `/opportunity-applications/:id/reject`         | Owner      | Reject a pending application             |
+| PATCH  | `/opportunity-applications/:id/withdraw`       | Applicant  | Withdraw a pending or accepted application |
 
-Application statuses may include `pending`, `accepted`, `rejected`, `waitlisted`, `withdrawn`, `attended`, and `absent`.
+Applications can only be submitted for published opportunities that have not started. Organization owners cannot apply to their own organization's opportunities, and duplicate applications are rejected.
 
-The backend must enforce capacity limits, prevent duplicate applications, and validate status transitions.
+Application statuses used by this module: `pending`, `accepted`, `rejected`, `withdrawn`. Capacity is based on the number of **accepted** applications; pending applications may exceed capacity, but acceptance is transactional and can never exceed it. Withdrawing an accepted application releases its capacity. Applications cannot be withdrawn after the opportunity starts.
 
 ## 9. Free-Item Sharing
 
