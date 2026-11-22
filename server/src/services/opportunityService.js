@@ -93,7 +93,14 @@ async function createOpportunity({
 }
 
 async function getOrganizationOpportunities(organizationId, userId = null) {
-  const pool = require("../config/db");
+  const organization = await pool.query(
+    "SELECT id FROM organizations WHERE id = $1",
+    [organizationId],
+  );
+
+  if (organization.rows.length === 0) {
+    throw httpError(404, "Organization not found");
+  }
 
   let canManage = false;
 

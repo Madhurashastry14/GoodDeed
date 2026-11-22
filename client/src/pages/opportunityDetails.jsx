@@ -632,37 +632,38 @@ export default function OpportunityDetails() {
                         {application.status}
                       </span>
 
-                      {application.status === "pending" && (
-                        <div className="opp-applicant-actions">
-                          <button
-                            type="button"
-                            className="opp-app-accept"
-                            disabled={Boolean(applicantBusy)}
-                            onClick={() =>
-                              handleApplicantAction(application, "accept")
-                            }
-                          >
-                            <CheckCircle size={14} />
-                            {applicantBusy === `accept-${application.id}`
-                              ? "Accepting..."
-                              : "Accept"}
-                          </button>
+                      {opportunity.status === "published" &&
+                        application.status === "pending" && (
+                          <div className="opp-applicant-actions">
+                            <button
+                              type="button"
+                              className="opp-app-accept"
+                              disabled={Boolean(applicantBusy)}
+                              onClick={() =>
+                                handleApplicantAction(application, "accept")
+                              }
+                            >
+                              <CheckCircle size={14} />
+                              {applicantBusy === `accept-${application.id}`
+                                ? "Accepting..."
+                                : "Accept"}
+                            </button>
 
-                          <button
-                            type="button"
-                            className="opp-app-reject"
-                            disabled={Boolean(applicantBusy)}
-                            onClick={() =>
-                              handleApplicantAction(application, "reject")
-                            }
-                          >
-                            <XCircle size={14} />
-                            {applicantBusy === `reject-${application.id}`
-                              ? "Rejecting..."
-                              : "Reject"}
-                          </button>
-                        </div>
-                      )}
+                            <button
+                              type="button"
+                              className="opp-app-reject"
+                              disabled={Boolean(applicantBusy)}
+                              onClick={() =>
+                                handleApplicantAction(application, "reject")
+                              }
+                            >
+                              <XCircle size={14} />
+                              {applicantBusy === `reject-${application.id}`
+                                ? "Rejecting..."
+                                : "Reject"}
+                            </button>
+                          </div>
+                        )}
                     </div>
                   ))}
                 </div>

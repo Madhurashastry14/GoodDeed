@@ -119,6 +119,12 @@ async function getOrganizationOpportunities(req, res) {
     const { id } = req.params;
     const userId = req.user?.id ?? null;
 
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid organization ID is required",
+      });
+    }
+
     const opportunities = await opportunityService.getOrganizationOpportunities(
       id,
       userId,
@@ -128,8 +134,10 @@ async function getOrganizationOpportunities(req, res) {
   } catch (error) {
     console.error("Get opportunities error:", error);
 
-    return res.status(500).json({
-      error: "Failed to fetch organization opportunities",
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Failed to fetch organization opportunities",
     });
   }
 }

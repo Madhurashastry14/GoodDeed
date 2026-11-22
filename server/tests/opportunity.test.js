@@ -897,3 +897,168 @@ test("applications cannot be withdrawn after the opportunity starts", async () =
 
   assert.equal(response.status, 409);
 });
+
+test("organization opportunity listing validates the organization", async () => {
+  const missing = await api(
+    `/opportunities/organization/${randomUUID()}`,
+  );
+  const malformed = await api("/opportunities/organization/not-a-uuid");
+
+  assert.equal(missing.status, 404);
+  assert.equal(malformed.status, 400);
+});
+
+test("my applications include withdraw eligibility", async () => {
+  const response = await api("/opportunity-applications/mine", {
+    token: tokenFor(applicantOne),
+  });
+
+  assert.equal(response.status, 200);
+
+  const application = response.data.applications.find(
+    (item) => item.id === applicantApplicationId,
+  );
+
+  assert.ok(application);
+  assert.equal(application.can_withdraw, true);
+});
+
+test("admin cannot view opportunity applicants", async () => {
+  const response = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      token: tokenFor(admin),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
+
+test("applications are rejected when accepted capacity is full", async () => {
+  const opportunityId = await insertOpportunity({
+    status: "published",
+    title: "Apply Full",
+    capacity: 1,
+  });
+
+  const application = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(application.status, 201);
+
+  const accepted = await api(
+    `/opportunity-applications/${application.data.application.id}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(accepted.status, 200);
+
+  const full = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(outsider),
+    },
+  );
+
+  assert.equal(full.status, 409);
+});
+
+test("withdrawn applications cannot be submitted again", async () => {
+  const opportunityId = await insertOpportunity({
+    status: "published",
+    title: "Apply Withdraw Again",
+  });
+
+  const applied = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  const withdrawn = await api(
+    `/opportunity-applications/${applied.data.application.id}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(withdrawn.status, 200);
+
+  const reapply = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(reapply.status, 409);
+});
+
+test("concurrent accepts cannot exceed capacity", async () => {
+  const opportunityId = await insertOpportunity({
+    status: "published",
+    title: "Apply Race",
+    capacity: 1,
+  });
+
+  const first = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantOne),
+    },
+  );
+  const second = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(first.status, 201);
+  assert.equal(second.status, 201);
+
+  const results = await Promise.all([
+    api(
+      `/opportunity-applications/${first.data.application.id}/accept`,
+      {
+        method: "PATCH",
+        token: tokenFor(owner),
+      },
+    ),
+    api(
+      `/opportunity-applications/${second.data.application.id}/accept`,
+      {
+        method: "PATCH",
+        token: tokenFor(owner),
+      },
+    ),
+  ]);
+
+  const statuses = results.map((result) => result.status).sort();
+
+  assert.deepEqual(statuses, [200, 409]);
+
+  const accepted = await pool.query(
+    `SELECT COUNT(*)::int AS count
+     FROM applications
+     WHERE opportunity_id = $1 AND status = 'accepted'`,
+    [opportunityId],
+  );
+
+  assert.equal(accepted.rows[0].count, 1);
+});

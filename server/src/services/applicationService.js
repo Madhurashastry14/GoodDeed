@@ -224,7 +224,7 @@ async function acceptApplication(applicationId, userId) {
     await client.query("BEGIN");
 
     const applicationResult = await client.query(
-      `SELECT id, opportunity_id, user_id, status
+      `SELECT id, opportunity_id
        FROM applications
        WHERE id = $1`,
       [applicationId],
@@ -236,6 +236,7 @@ async function acceptApplication(applicationId, userId) {
 
     const application = applicationResult.rows[0];
 
+    // Lock the opportunity before the application, matching the apply flow.
     const opportunityResult = await client.query(
       `SELECT id, organization_id, status, capacity
        FROM opportunities
@@ -245,6 +246,14 @@ async function acceptApplication(applicationId, userId) {
     );
 
     const opportunity = opportunityResult.rows[0];
+
+    const lockedApplication = await client.query(
+      `SELECT status
+       FROM applications
+       WHERE id = $1
+       FOR UPDATE`,
+      [applicationId],
+    );
 
     const role = await getMembershipRole(
       client,
@@ -259,7 +268,7 @@ async function acceptApplication(applicationId, userId) {
       );
     }
 
-    if (application.status !== "pending") {
+    if (lockedApplication.rows[0]?.status !== "pending") {
       throw httpError(
         409,
         "Only pending applications can be accepted",
@@ -315,7 +324,8 @@ async function rejectApplication(applicationId, userId) {
       `SELECT a.id, a.opportunity_id, a.status, o.organization_id
        FROM applications a
        JOIN opportunities o ON o.id = a.opportunity_id
-       WHERE a.id = $1`,
+       WHERE a.id = $1
+       FOR UPDATE OF a`,
       [applicationId],
     );
 
@@ -374,7 +384,8 @@ async function withdrawApplication(applicationId, userId) {
       `SELECT a.id, a.user_id, a.status, o.starts_at
        FROM applications a
        JOIN opportunities o ON o.id = a.opportunity_id
-       WHERE a.id = $1`,
+       WHERE a.id = $1
+       FOR UPDATE OF a`,
       [applicationId],
     );
 

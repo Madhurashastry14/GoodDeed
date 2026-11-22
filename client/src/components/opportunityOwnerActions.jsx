@@ -15,12 +15,15 @@ export default function OpportunityOwnerActions({
   accessToken,
   onUpdated,
   onDeleted,
+  isOwner,
   compact = false,
 }) {
   const [busyAction, setBusyAction] = useState("");
   const [error, setError] = useState("");
 
-  if (!opportunity?.is_owner) {
+  const canManage = isOwner ?? opportunity?.is_owner;
+
+  if (!canManage) {
     return null;
   }
 

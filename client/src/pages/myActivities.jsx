@@ -197,13 +197,23 @@ export default function MyActivities() {
                     </div>
 
                     <div className="my-act-card-actions">
-                      <Link
-                        to={`/opportunities/${application.opportunity_id}`}
-                        className="my-act-view"
-                      >
-                        View opportunity
-                        <ArrowRight size={15} />
-                      </Link>
+                      {application.opportunity_status === "published" ? (
+                        <Link
+                          to={`/opportunities/${application.opportunity_id}`}
+                          className="my-act-view"
+                        >
+                          View opportunity
+                          <ArrowRight size={15} />
+                        </Link>
+                      ) : (
+                        <Link
+                          to={`/organizations/${application.organization_id}`}
+                          className="my-act-view"
+                        >
+                          View organization
+                          <ArrowRight size={15} />
+                        </Link>
+                      )}
 
                       {application.can_withdraw && (
                         <button

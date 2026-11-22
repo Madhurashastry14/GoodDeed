@@ -541,6 +541,7 @@ export default function OrganizationDetails() {
                             <OpportunityOwnerActions
                               opportunity={opportunity}
                               accessToken={accessToken}
+                              isOwner={isOwner}
                               compact
                               onUpdated={(updated) =>
                                 setOpportunities((previous) =>
