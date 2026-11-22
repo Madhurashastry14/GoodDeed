@@ -14,8 +14,12 @@ let owner;
 let admin;
 let member;
 let outsider;
+let applicantOne;
+let applicantTwo;
 let organizationId;
 let draftOpportunityId;
+let applyOpportunityId;
+let applicantApplicationId;
 
 function tokenFor(userId) {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
@@ -96,6 +100,22 @@ async function insertOpportunity({
   return id;
 }
 
+async function insertApplication({
+  opportunityId,
+  userId,
+  status = "pending",
+}) {
+  const id = randomUUID();
+
+  await pool.query(
+    `INSERT INTO applications (id, opportunity_id, user_id, status)
+     VALUES ($1, $2, $3, $4)`,
+    [id, opportunityId, userId, status],
+  );
+
+  return id;
+}
+
 before(async () => {
   const health = await fetch(`${API_URL}/health`);
 
@@ -105,6 +125,8 @@ before(async () => {
   admin = await createUser("Admin");
   member = await createUser("Member");
   outsider = await createUser("Outsider");
+  applicantOne = await createUser("ApplicantOne");
+  applicantTwo = await createUser("ApplicantTwo");
 
   organizationId = randomUUID();
 
@@ -139,9 +161,13 @@ before(async () => {
 });
 
 after(async () => {
-  await pool.query("DELETE FROM applications WHERE opportunity_id = $1", [
-    draftOpportunityId,
-  ]);
+  await pool.query(
+    `DELETE FROM applications
+     WHERE opportunity_id IN (
+       SELECT id FROM opportunities WHERE organization_id = $1
+     )`,
+    [organizationId],
+  );
   await pool.query("DELETE FROM opportunities WHERE organization_id = $1", [
     organizationId,
   ]);
@@ -150,7 +176,7 @@ after(async () => {
   ]);
   await pool.query("DELETE FROM organizations WHERE id = $1", [organizationId]);
   await pool.query("DELETE FROM users WHERE id = ANY($1::uuid[])", [
-    [owner, admin, member, outsider],
+    [owner, admin, member, outsider, applicantOne, applicantTwo],
   ]);
   await pool.end();
 });
@@ -595,4 +621,279 @@ test("public listing rejects invalid filters", async () => {
 
   assert.equal(badSort.status, 400);
   assert.equal(badLimit.status, 400);
+});
+
+test("applicant can apply to a published opportunity", async () => {
+  const opportunityId = await insertOpportunity({
+    status: "published",
+    title: "Apply Alpha",
+    capacity: 2,
+  });
+
+  const response = await api(`/opportunities/${opportunityId}/applications`, {
+    method: "POST",
+    token: tokenFor(applicantOne),
+  });
+
+  assert.equal(response.status, 201, JSON.stringify(response.data));
+  assert.equal(response.data.application.status, "pending");
+
+  applyOpportunityId = opportunityId;
+  applicantApplicationId = response.data.application.id;
+});
+
+test("duplicate applications are rejected", async () => {
+  const response = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(response.status, 409);
+});
+
+test("organization owner cannot apply to their own opportunity", async () => {
+  const response = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
+
+test("applications are closed for draft opportunities", async () => {
+  const draftId = await insertOpportunity({ status: "draft" });
+
+  const response = await api(`/opportunities/${draftId}/applications`, {
+    method: "POST",
+    token: tokenFor(applicantOne),
+  });
+
+  assert.equal(response.status, 409);
+});
+
+test("users only see their own applications", async () => {
+  const mine = await api("/opportunity-applications/mine", {
+    token: tokenFor(applicantOne),
+  });
+  const other = await api("/opportunity-applications/mine", {
+    token: tokenFor(applicantTwo),
+  });
+
+  assert.equal(mine.status, 200);
+  assert.ok(
+    mine.data.applications.some(
+      (application) => application.id === applicantApplicationId,
+    ),
+  );
+  assert.deepEqual(other.data.applications, []);
+});
+
+test("non-owner cannot view opportunity applicants", async () => {
+  const response = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
+
+test("owner can view opportunity applicants", async () => {
+  const response = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunity.accepted_count, 0);
+  assert.equal(response.data.opportunity.remaining_capacity, 2);
+  assert.ok(
+    response.data.applications.some(
+      (application) =>
+        application.id === applicantApplicationId &&
+        application.applicant_name === "ApplicantOne",
+    ),
+  );
+});
+
+test("owner can accept a pending application", async () => {
+  const response = await api(
+    `/opportunity-applications/${applicantApplicationId}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 200, JSON.stringify(response.data));
+  assert.equal(response.data.application.status, "accepted");
+
+  const applicants = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(applicants.data.opportunity.accepted_count, 1);
+  assert.equal(applicants.data.opportunity.remaining_capacity, 1);
+});
+
+test("accepting an already accepted application is rejected", async () => {
+  const response = await api(
+    `/opportunity-applications/${applicantApplicationId}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(response.status, 409);
+});
+
+test("accepting applicants cannot exceed capacity", async () => {
+  const opportunityId = await insertOpportunity({
+    status: "published",
+    title: "Apply Capacity",
+    capacity: 1,
+  });
+
+  const first = await api(`/opportunities/${opportunityId}/applications`, {
+    method: "POST",
+    token: tokenFor(applicantOne),
+  });
+  const second = await api(`/opportunities/${opportunityId}/applications`, {
+    method: "POST",
+    token: tokenFor(applicantTwo),
+  });
+
+  assert.equal(first.status, 201);
+  assert.equal(second.status, 201);
+
+  const accepted = await api(
+    `/opportunity-applications/${first.data.application.id}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(accepted.status, 200);
+
+  const overCapacity = await api(
+    `/opportunity-applications/${second.data.application.id}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(overCapacity.status, 409);
+
+  const rejected = await api(
+    `/opportunity-applications/${second.data.application.id}/reject`,
+    {
+      method: "PATCH",
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(rejected.status, 200);
+  assert.equal(rejected.data.application.status, "rejected");
+
+  const withdrawn = await api(
+    `/opportunity-applications/${first.data.application.id}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(withdrawn.status, 200);
+  assert.equal(withdrawn.data.application.status, "withdrawn");
+
+  const applicants = await api(
+    `/opportunities/${opportunityId}/applications`,
+    {
+      token: tokenFor(owner),
+    },
+  );
+
+  assert.equal(applicants.data.opportunity.accepted_count, 0);
+});
+
+test("applicants can only withdraw their own applications", async () => {
+  const applied = await api(
+    `/opportunities/${applyOpportunityId}/applications`,
+    {
+      method: "POST",
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(applied.status, 201);
+
+  const applicationId = applied.data.application.id;
+
+  const notOwner = await api(
+    `/opportunity-applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(notOwner.status, 403);
+
+  const nonOwnerAccept = await api(
+    `/opportunity-applications/${applicationId}/accept`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(nonOwnerAccept.status, 403);
+
+  const withdrawn = await api(
+    `/opportunity-applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(withdrawn.status, 200);
+});
+
+test("applications cannot be withdrawn after the opportunity starts", async () => {
+  const pastId = await insertOpportunity({
+    status: "published",
+    startHours: -8,
+    endHours: -4,
+  });
+
+  const applicationId = await insertApplication({
+    opportunityId: pastId,
+    userId: applicantOne,
+  });
+
+  const response = await api(
+    `/opportunity-applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantOne),
+    },
+  );
+
+  assert.equal(response.status, 409);
 });

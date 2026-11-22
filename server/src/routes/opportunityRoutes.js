@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const opportunityController = require("../controller/opportunityController");
+const applicationController = require("../controller/applicationController");
 
 const Middleware = require("../middleware/authMiddleware");
 
@@ -35,6 +36,18 @@ router.patch(
   "/:id/complete",
   Middleware.authMiddleware,
   opportunityController.completeOpportunity,
+);
+
+router.post(
+  "/:id/applications",
+  Middleware.authMiddleware,
+  applicationController.createApplication,
+);
+
+router.get(
+  "/:id/applications",
+  Middleware.authMiddleware,
+  applicationController.getOpportunityApplications,
 );
 
 router.get(
