@@ -212,3 +212,64 @@ test("outsider cannot create an opportunity", async () => {
 
   assert.equal(response.status, 403);
 });
+
+test("owner can view draft opportunity details", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`, {
+    token: tokenFor(owner),
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunity.id, draftOpportunityId);
+  assert.equal(response.data.opportunity.is_owner, true);
+  assert.ok(response.data.opportunity.organization_name);
+});
+
+test("admin cannot view draft opportunity details", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`, {
+    token: tokenFor(admin),
+  });
+
+  assert.equal(response.status, 404);
+});
+
+test("public visitor cannot view draft opportunity details", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`);
+
+  assert.equal(response.status, 404);
+});
+
+test("owner can edit a draft opportunity", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+    body: {
+      title: "Updated cleanup",
+      capacity: 12,
+    },
+  });
+
+  assert.equal(response.status, 200, JSON.stringify(response.data));
+  assert.equal(response.data.opportunity.title, "Updated cleanup");
+  assert.equal(response.data.opportunity.capacity, 12);
+  assert.equal(response.data.opportunity.status, "draft");
+});
+
+test("admin cannot edit an opportunity", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`, {
+    method: "PATCH",
+    token: tokenFor(admin),
+    body: { title: "Admin edit" },
+  });
+
+  assert.equal(response.status, 403);
+});
+
+test("PATCH cannot change status", async () => {
+  const response = await api(`/opportunities/${draftOpportunityId}`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+    body: { status: "published" },
+  });
+
+  assert.equal(response.status, 400);
+});

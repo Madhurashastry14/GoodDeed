@@ -134,7 +134,194 @@ async function getOrganizationOpportunities(req, res) {
   }
 }
 
+async function getOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    const opportunity = await opportunityService.getOpportunityById(
+      id,
+      req.user?.id ?? null,
+    );
+
+    if (!opportunity) {
+      return res.status(404).json({
+        error: "Opportunity not found",
+      });
+    }
+
+    return res.status(200).json({ opportunity });
+  } catch (error) {
+    console.error("Get opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to fetch opportunity",
+    });
+  }
+}
+
+async function patchOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    const forbiddenFields = [
+      "id",
+      "organization_id",
+      "created_by",
+      "status",
+    ].filter((field) => req.body[field] !== undefined);
+
+    if (forbiddenFields.length > 0) {
+      return res.status(400).json({
+        error: "ID, organization, creator, and status cannot be updated",
+      });
+    }
+
+    const DATE_TIME_REGEX =
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+    const updates = {};
+
+    if (req.body.title !== undefined) {
+      if (
+        typeof req.body.title !== "string" ||
+        !req.body.title.trim() ||
+        req.body.title.trim().length > 200
+      ) {
+        return res.status(400).json({
+          error: "Title must contain 1 to 200 characters",
+        });
+      }
+
+      updates.title = req.body.title.trim();
+    }
+
+    if (req.body.description !== undefined) {
+      if (
+        typeof req.body.description !== "string" ||
+        !req.body.description.trim()
+      ) {
+        return res.status(400).json({
+          error: "Description cannot be empty",
+        });
+      }
+
+      updates.description = req.body.description.trim();
+    }
+
+    if (req.body.city !== undefined) {
+      if (
+        typeof req.body.city !== "string" ||
+        !req.body.city.trim() ||
+        req.body.city.trim().length > 100
+      ) {
+        return res.status(400).json({
+          error: "City must contain 1 to 100 characters",
+        });
+      }
+
+      updates.city = req.body.city.trim();
+    }
+
+    for (const field of ["startsAt", "endsAt"]) {
+      if (req.body[field] !== undefined) {
+        if (
+          typeof req.body[field] !== "string" ||
+          !DATE_TIME_REGEX.test(req.body[field]) ||
+          !Number.isFinite(new Date(req.body[field]).getTime())
+        ) {
+          return res.status(400).json({
+            error: "Valid start and end date-times with timezones are required",
+          });
+        }
+
+        updates[field] = req.body[field];
+      }
+    }
+
+    if (req.body.capacity !== undefined) {
+      if (
+        req.body.capacity !== null &&
+        (!Number.isInteger(req.body.capacity) || req.body.capacity <= 0)
+      ) {
+        return res.status(400).json({
+          error: "Capacity must be a positive integer or null",
+        });
+      }
+
+      updates.capacity = req.body.capacity;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        error: "No valid fields were supplied for update",
+      });
+    }
+
+    const opportunity = await opportunityService.updateOpportunity(
+      id,
+      req.user.id,
+      updates,
+    );
+
+    return res.status(200).json({
+      message: "Opportunity updated successfully",
+      opportunity,
+    });
+  } catch (error) {
+    console.error("Update opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to update opportunity",
+    });
+  }
+}
+
+async function publishOpportunity(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid opportunity ID is required",
+      });
+    }
+
+    const opportunity = await opportunityService.publishOpportunity(
+      id,
+      req.user.id,
+    );
+
+    return res.status(200).json({
+      message: "Opportunity published successfully",
+      opportunity,
+    });
+  } catch (error) {
+    console.error("Publish opportunity failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to publish opportunity",
+    });
+  }
+}
+
 module.exports = {
   createOpportunity,
   getOrganizationOpportunities,
+  getOpportunity,
+  patchOpportunity,
+  publishOpportunity,
 };

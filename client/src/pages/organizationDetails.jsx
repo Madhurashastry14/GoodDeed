@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
@@ -45,7 +45,10 @@ function formatOpportunityDate(value) {
 
 export default function OrganizationDetails() {
   const { id } = useParams();
+  const location = useLocation();
   const { accessToken, loading: authLoading } = useAuth();
+
+  const [notice] = useState(location.state?.message || "");
 
   const [isOwner, setIsOwner] = useState(false);
   const [canCreateOpportunity, setCanCreateOpportunity] = useState(false);
@@ -298,6 +301,12 @@ export default function OrganizationDetails() {
             All organizations
           </Link>
 
+          {notice && (
+            <div className="org-detail-notice" role="status">
+              {notice}
+            </div>
+          )}
+
           {/* Organization header */}
           <section className="org-detail-hero">
             <div className="org-detail-logo">
@@ -517,6 +526,26 @@ export default function OrganizationDetails() {
                             <Clock size={15} />
                             Ends: {formatOpportunityDate(opportunity.ends_at)}
                           </span>
+                        </div>
+
+                        <div className="org-opp-card-actions">
+                          <Link
+                            to={`/opportunities/${opportunity.id}`}
+                            className="org-opp-view-link"
+                          >
+                            View details
+                          </Link>
+
+                          {isOwner &&
+                            ["draft", "published"].includes(status) && (
+                              <Link
+                                to={`/opportunities/${opportunity.id}/edit`}
+                                className="org-opp-edit-link"
+                              >
+                                <Pencil size={14} />
+                                Edit
+                              </Link>
+                            )}
                         </div>
                       </article>
                     );

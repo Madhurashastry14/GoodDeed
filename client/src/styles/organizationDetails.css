@@ -446,6 +446,55 @@
   color: #477a55;
 }
 
+.org-opp-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #edf1ec;
+}
+
+.org-opp-view-link {
+  color: #176c3b;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.org-opp-view-link:hover {
+  text-decoration: underline;
+}
+
+.org-opp-edit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #cfe0cd;
+  border-radius: 8px;
+  background: #fff;
+  color: #176c3b;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.org-opp-edit-link:hover {
+  background: #f0f7ef;
+}
+
+.org-detail-notice {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 @media (max-width: 480px) {
   .org-opportunities-section {
     padding: 23px;

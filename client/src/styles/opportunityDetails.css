@@ -1,0 +1,263 @@
+.opp-detail-page {
+  min-height: 100vh;
+  background: #fafbf7;
+  color: #193d29;
+  font-family: "DM Sans", sans-serif;
+}
+
+.opp-detail-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px 24px 90px;
+}
+
+.opp-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #477a55;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.opp-detail-back:hover {
+  color: #176c3b;
+}
+
+.opp-detail-notice {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-detail-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 25px;
+  padding: 40px;
+  background: linear-gradient(120deg, #e9f4e8, #f3f8ee);
+  border: 1px solid #dfebdd;
+  border-radius: 20px;
+}
+
+.opp-detail-hero-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.opp-detail-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.opp-detail-eyebrow {
+  color: #287a46;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.opp-detail-status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.opp-detail-status-badge.status-draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.opp-detail-status-badge.status-published {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.opp-detail-status-badge.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.opp-detail-status-badge.status-completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.opp-detail-hero h1 {
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -1.3px;
+  margin: 14px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.opp-detail-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #176c3b;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.opp-detail-org:hover {
+  text-decoration: underline;
+}
+
+.opp-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #687e6c;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.opp-detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.opp-detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.opp-detail-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.opp-detail-edit-btn:hover {
+  background: #11552e;
+}
+
+.opp-detail-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.opp-detail-card {
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.opp-detail-card h2 {
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  letter-spacing: -0.5px;
+  margin: 0 0 20px;
+}
+
+.opp-detail-description {
+  color: #697b6d;
+  font-size: 14px;
+  line-height: 2;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.opp-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.opp-detail-info > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #176c3b;
+}
+
+.opp-detail-info > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.opp-detail-info span {
+  color: #819083;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.opp-detail-info strong {
+  color: #25432e;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.opp-detail-status {
+  padding: 90px 24px;
+  text-align: center;
+  color: #667b6b;
+}
+
+.opp-detail-status h2 {
+  color: #193d29;
+}
+
+.opp-detail-status a {
+  color: #176c3b;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .opp-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .opp-detail-hero {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .opp-detail-container {
+    padding: 25px 16px 60px;
+  }
+
+  .opp-detail-hero {
+    padding: 25px;
+  }
+
+  .opp-detail-card {
+    padding: 23px;
+  }
+}

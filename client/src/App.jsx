@@ -15,6 +15,8 @@ import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
 import CreateOpportunity from "./pages/createOpportunity";
+import OpportunityDetails from "./pages/opportunityDetails";
+import EditOpportunity from "./pages/editOpportunity";
 
 export default function App() {
   return (
@@ -82,6 +84,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CreateOpportunity />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/opportunities/:id" element={<OpportunityDetails />} />
+        <Route
+          path="/opportunities/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditOpportunity />
             </ProtectedRoute>
           }
         />

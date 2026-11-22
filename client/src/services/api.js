@@ -280,6 +280,75 @@ export async function getOrganizationOpportunities(
   return data;
 }
 
+export async function getOpportunityById(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}`,
+    {
+      method: "GET",
+      headers: accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : undefined,
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch opportunity");
+  }
+
+  return data;
+}
+
+export async function updateOpportunity(
+  opportunityId,
+  opportunityData,
+  accessToken,
+) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(opportunityData),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to update opportunity");
+  }
+
+  return data;
+}
+
+export async function publishOpportunity(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}/publish`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to publish opportunity");
+  }
+
+  return data;
+}
+
 export async function createOpportunity(opportunityData, accessToken) {
   const response = await fetch("http://localhost:3000/api/opportunities", {
     method: "POST",

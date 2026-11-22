@@ -17,4 +17,22 @@ router.get(
   opportunityController.getOrganizationOpportunities,
 );
 
+router.patch(
+  "/:id/publish",
+  Middleware.authMiddleware,
+  opportunityController.publishOpportunity,
+);
+
+router.get(
+  "/:id",
+  Middleware.optionalAuthMiddleware,
+  opportunityController.getOpportunity,
+);
+
+router.patch(
+  "/:id",
+  Middleware.authMiddleware,
+  opportunityController.patchOpportunity,
+);
+
 module.exports = router;
