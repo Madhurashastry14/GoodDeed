@@ -7,18 +7,15 @@ import {
   Gift,
   HeartHandshake,
   Users,
-  Package,
   UserRound,
-  MapPin,
   Sparkles,
   ClipboardList,
-  Plus,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
-import "../styles/dashboard.css";
 import { getMyOrganizations } from "../services/api";
+import "../styles/dashboard.css";
 
 const actions = [
   {
@@ -68,6 +65,7 @@ export default function Dashboard() {
     if (authLoading) return;
 
     if (!accessToken) {
+      setOrganizations([]);
       setOrganizationsLoading(false);
       setOrganizationsError("Please log in to view your organizations.");
       return;
@@ -117,6 +115,7 @@ export default function Dashboard() {
 
       <main className="dashboard-page">
         <div className="dashboard-container">
+          {/* Welcome Section */}
           <section className="dashboard-welcome">
             <div className="dashboard-welcome-content">
               <span className="dashboard-eyebrow">
@@ -133,24 +132,10 @@ export default function Dashboard() {
                 ways to connect, contribute, and support your community.
               </p>
 
-              <div className="dashboard-welcome-actions">
-                <Link to="/organizations" className="dashboard-primary-btn">
-                  Explore organizations
-                  <ArrowRight size={18} />
-                </Link>
-
-                {organizations.some((org) =>
-                  ["owner", "admin"].includes(org.role?.toLowerCase()),
-                ) && (
-                  <Link
-                    to="/opportunities/new"
-                    className="dashboard-create-opp"
-                  >
-                    <Plus size={18} />
-                    Create Opportunity
-                  </Link>
-                )}
-              </div>
+              <Link to="/organizations" className="dashboard-primary-btn">
+                Explore organizations
+                <ArrowRight size={18} />
+              </Link>
             </div>
 
             <div className="dashboard-welcome-visual">
@@ -160,12 +145,14 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* Action Cards */}
           <section className="dashboard-section">
             <div className="dashboard-section-header">
               <div>
                 <span className="dashboard-section-label">
                   MAKE A DIFFERENCE
                 </span>
+
                 <h2>What would you like to do today?</h2>
                 <p>Find your own way to make a positive impact.</p>
               </div>
@@ -202,7 +189,9 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* Bottom Panels */}
           <section className="dashboard-bottom-grid">
+            {/* My Activities */}
             <div className="dashboard-panel">
               <div className="dashboard-panel-header">
                 <div>
@@ -232,6 +221,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* My Organizations */}
             <div className="dashboard-panel">
               <div className="dashboard-panel-header">
                 <div>
@@ -264,7 +254,8 @@ export default function Dashboard() {
                   </p>
 
                   <Link to="/organizations">
-                    Explore organizations <ArrowRight size={15} />
+                    Explore organizations
+                    <ArrowRight size={15} />
                   </Link>
                 </div>
               ) : (
@@ -317,6 +308,7 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* Profile Banner */}
           <section className="dashboard-profile-banner">
             <div className="dashboard-profile-icon">
               <UserRound size={25} />

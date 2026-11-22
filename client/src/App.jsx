@@ -78,7 +78,7 @@ export default function App() {
         />
 
         <Route
-          path="/opportunities/new"
+          path="/organizations/:id/opportunities/new"
           element={
             <ProtectedRoute>
               <CreateOpportunity />

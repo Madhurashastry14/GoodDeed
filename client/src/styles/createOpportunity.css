@@ -200,3 +200,13 @@
     flex-wrap: wrap;
   }
 }
+
+.create-opp-org-name {
+  padding: 14px;
+  border: 1px solid #dce6da;
+  border-radius: 9px;
+  background: #f5f8f3;
+  color: #193d29;
+  font-size: 14px;
+  font-weight: 700;
+}

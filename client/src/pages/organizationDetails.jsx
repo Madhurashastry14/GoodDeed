@@ -8,6 +8,7 @@ import {
   Users,
   UserRound,
   Pencil,
+  Plus,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
@@ -24,11 +25,14 @@ export default function OrganizationDetails() {
   const { accessToken, loading: authLoading } = useAuth();
 
   const [isOwner, setIsOwner] = useState(false);
+  const [canCreateOpportunity, setCanCreateOpportunity] = useState(false);
 
   const [organization, setOrganization] = useState(null);
   const [members, setMembers] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [membersLoading, setMembersLoading] = useState(true);
+
   const [error, setError] = useState("");
   const [membersError, setMembersError] = useState("");
 
@@ -44,10 +48,7 @@ export default function OrganizationDetails() {
       try {
         const data = await getOrganizationById(id);
 
-        // Backend returns:
-        // { organization: [{ id, name, city, ... }] }
         const raw = data.organization ?? data;
-
         const org = Array.isArray(raw) ? raw[0] : raw;
 
         if (!org || !org.id) {
@@ -114,16 +115,20 @@ export default function OrganizationDetails() {
     };
   }, [id]);
 
+  // Check the logged-in user's organization role
   useEffect(() => {
     if (authLoading) return;
 
     let active = true;
 
-    async function checkOwnership() {
-      setIsOwner(false);
+    setIsOwner(false);
+    setCanCreateOpportunity(false);
 
-      if (!accessToken) return;
+    if (!accessToken) {
+      return;
+    }
 
+    async function checkPermissions() {
       try {
         const data = await getMyOrganizations(accessToken);
 
@@ -135,22 +140,28 @@ export default function OrganizationDetails() {
           throw new Error("Unexpected organizations response");
         }
 
-        const owned = organizations.some(
-          (org) =>
-            String(org.id) === String(id) &&
-            org.role?.toLowerCase() === "owner",
+        const membership = organizations.find(
+          (org) => String(org.id) === String(id),
         );
 
+        const role = membership?.role?.toLowerCase();
+
         if (active) {
-          setIsOwner(owned);
+          setIsOwner(role === "owner");
+
+          setCanCreateOpportunity(role === "owner" || role === "admin");
         }
       } catch (err) {
-        console.error("Unable to check organization ownership:", err);
-        if (active) setIsOwner(false);
+        console.error("Unable to check organization permissions:", err);
+
+        if (active) {
+          setIsOwner(false);
+          setCanCreateOpportunity(false);
+        }
       }
     }
 
-    checkOwnership();
+    checkPermissions();
 
     return () => {
       active = false;
@@ -162,7 +173,6 @@ export default function OrganizationDetails() {
     return (
       <>
         <Navbar />
-
         <main className="org-detail-status">Loading organization...</main>
       </>
     );
@@ -253,12 +263,26 @@ export default function OrganizationDetails() {
                 </a>
               )}
 
+              {/* Owner and admin actions */}
+              {canCreateOpportunity && (
+                <Link
+                  to={`/organizations/${id}/opportunities/new`}
+                  className="org-create-opp-btn"
+                >
+                  <Plus size={17} />
+                  Create Opportunity
+                </Link>
+              )}
+
+              {/* Owner-only actions */}
               {isOwner && (
                 <Link to={`/organizations/${id}/edit`} className="org-edit-btn">
                   <Pencil size={16} />
                   Edit organization
                 </Link>
               )}
+
+              {/* Members */}
               <Link
                 to={`/organizations/${id}/members`}
                 className="org-edit-btn"
