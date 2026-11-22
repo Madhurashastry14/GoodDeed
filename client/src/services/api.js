@@ -203,3 +203,55 @@ export async function deleteOrganization(id, accessToken) {
 
   return data;
 }
+
+export async function addOrganizationMember(
+  organizationId,
+  userId,
+  accessToken,
+) {
+  const response = await fetch(
+    `http://localhost:3000/api/organizations/${organizationId}/members`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+      body: JSON.stringify({ userId }),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to add member");
+  }
+
+  return data;
+}
+
+export async function removeOrganizationMember(
+  organizationId,
+  userId,
+  accessToken,
+) {
+  const response = await fetch(
+    `http://localhost:3000/api/organizations/${organizationId}/members/${encodeURIComponent(userId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to remove member");
+  }
+
+  return data;
+}

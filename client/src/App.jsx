@@ -10,7 +10,7 @@ import CreateOrganization from "./pages/createOrganization";
 import MyOrganizations from "./pages/myOrganizations";
 import Profile from "./pages/profile";
 import EditOrganization from "./pages/editOrganization";
-
+import OrganizationMembers from "./pages/organizationMembers";
 import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
@@ -59,6 +59,10 @@ export default function App() {
               <MyOrganizations />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/organizations/:id/members"
+          element={<OrganizationMembers />}
         />
 
         {/* Profile: backend implemented, frontend next */}

@@ -259,6 +259,13 @@ export default function OrganizationDetails() {
                   Edit organization
                 </Link>
               )}
+              <Link
+                to={`/organizations/${id}/members`}
+                className="org-edit-btn"
+              >
+                <Users size={16} />
+                {isOwner ? "Manage members" : "View members"}
+              </Link>
             </div>
           </section>
 

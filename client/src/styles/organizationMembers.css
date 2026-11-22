@@ -1,0 +1,272 @@
+.org-members-page {
+  min-height: 100vh;
+  padding: 45px 24px 90px;
+  background: #fafbf7;
+  color: #193d29;
+  font-family: "DM Sans", sans-serif;
+}
+
+.org-members-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.org-members-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #52705a;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.org-members-header {
+  margin: 38px 0 32px;
+}
+
+.org-members-eyebrow {
+  color: #27804b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.org-members-header h1 {
+  margin: 12px 0;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -1px;
+}
+
+.org-members-header p {
+  color: #758376;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.org-members-card {
+  margin-bottom: 24px;
+  padding: 30px;
+  border: 1px solid #e2eae0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.org-members-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.org-members-card-header h2 {
+  margin: 0 0 8px;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+}
+
+.org-members-card-header p {
+  margin: 0;
+  color: #839084;
+  font-size: 12px;
+}
+
+.org-members-card-header > svg {
+  flex-shrink: 0;
+  color: #287a46;
+}
+
+.org-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.org-members-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5ece3;
+  border-radius: 11px;
+}
+
+.org-members-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  border-radius: 11px;
+  background: #e8f3e7;
+  color: #176c3b;
+}
+
+.org-members-person {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.org-members-person strong {
+  color: #193d29;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.org-members-person span {
+  color: #819082;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.org-members-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: #f0f3ef;
+  color: #697b6c;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.org-members-role.owner {
+  background: #e8f4e9;
+  color: #176c3b;
+}
+
+.org-members-remove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #f0d5d1;
+  border-radius: 8px;
+  background: #fff;
+  color: #b42318;
+  cursor: pointer;
+}
+
+.org-members-remove:hover {
+  background: #fff1ef;
+}
+
+.org-members-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.org-members-empty,
+.org-members-readonly {
+  color: #829083;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.org-members-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: #415a46;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.org-members-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.org-members-form-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dce6da;
+  border-radius: 9px;
+  outline: none;
+  color: #193d29;
+  font: inherit;
+  font-size: 13px;
+}
+
+.org-members-form-row input:focus {
+  border-color: #27804b;
+}
+
+.org-members-form-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 19px;
+  border: 0;
+  border-radius: 9px;
+  background: #176c3b;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.org-members-form-row button:hover {
+  background: #11552e;
+}
+
+.org-members-form-row button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.org-members-hint {
+  margin: 12px 0 0;
+  color: #849185;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.org-members-alert {
+  margin-bottom: 22px;
+  padding: 15px 18px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.org-members-alert.error {
+  background: #fff1f0;
+  color: #b42318;
+}
+
+.org-members-alert.success {
+  background: #e8f5e9;
+  color: #176c3b;
+}
+
+@media (max-width: 650px) {
+  .org-members-page {
+    padding: 30px 16px 70px;
+  }
+
+  .org-members-card {
+    padding: 20px;
+  }
+
+  .org-members-item {
+    flex-wrap: wrap;
+    padding: 13px;
+  }
+
+  .org-members-form-row {
+    flex-direction: column;
+  }
+
+  .org-members-form-row button {
+    width: 100%;
+  }
+}
