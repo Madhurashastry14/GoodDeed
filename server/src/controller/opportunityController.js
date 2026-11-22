@@ -114,6 +114,27 @@ async function createOpportunity(req, res) {
   }
 }
 
+async function getOrganizationOpportunities(req, res) {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id ?? null;
+
+    const opportunities = await opportunityService.getOrganizationOpportunities(
+      id,
+      userId,
+    );
+
+    return res.status(200).json({ opportunities });
+  } catch (error) {
+    console.error("Get opportunities error:", error);
+
+    return res.status(500).json({
+      error: "Failed to fetch organization opportunities",
+    });
+  }
+}
+
 module.exports = {
   createOpportunity,
+  getOrganizationOpportunities,
 };

@@ -92,6 +92,47 @@ async function createOpportunity({
   }
 }
 
+async function getOrganizationOpportunities(organizationId, userId = null) {
+  const pool = require("../config/db");
+
+  let canManage = false;
+
+  // Check whether the user is an owner or admin
+  if (userId) {
+    const membership = await pool.query(
+      `SELECT role
+       FROM organization_members
+       WHERE organization_id = $1 AND user_id = $2`,
+      [organizationId, userId],
+    );
+
+    canManage = ["owner", "admin"].includes(membership.rows[0]?.role);
+  }
+
+  // Managers can see drafts; everyone else sees published only
+  const result = await pool.query(
+    `SELECT
+       id,
+       organization_id,
+       title,
+       description,
+       city,
+       starts_at,
+       ends_at,
+       capacity,
+       status,
+       created_at
+     FROM opportunities
+     WHERE organization_id = $1
+       AND ($2::boolean = TRUE OR status = 'published')
+     ORDER BY created_at DESC`,
+    [organizationId, canManage],
+  );
+
+  return result.rows;
+}
+
 module.exports = {
   createOpportunity,
+  getOrganizationOpportunities,
 };

@@ -7,4 +7,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 router.post("/", authMiddleware, opportunityController.createOpportunity);
 
+router.get(
+  "/organization/:id",
+  authMiddleware,
+  opportunityController.getOrganizationOpportunities,
+);
+
 module.exports = router;
