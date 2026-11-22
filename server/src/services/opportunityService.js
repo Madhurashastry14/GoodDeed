@@ -97,7 +97,7 @@ async function getOrganizationOpportunities(organizationId, userId = null) {
 
   let canManage = false;
 
-  // Check whether the user is an owner or admin
+  // Only the organization owner can see unpublished opportunities.
   if (userId) {
     const membership = await pool.query(
       `SELECT role
@@ -106,10 +106,10 @@ async function getOrganizationOpportunities(organizationId, userId = null) {
       [organizationId, userId],
     );
 
-    canManage = ["owner", "admin"].includes(membership.rows[0]?.role);
+    canManage = membership.rows[0]?.role === "owner";
   }
 
-  // Managers can see drafts; everyone else sees published only
+  // Owners can see drafts; everyone else sees published only
   const result = await pool.query(
     `SELECT
        id,

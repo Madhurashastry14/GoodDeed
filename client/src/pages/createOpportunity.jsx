@@ -62,7 +62,7 @@ export default function CreateOpportunity() {
         const selectedOrganization = list.find(
           (org) =>
             String(org.id) === String(id) &&
-            ["owner", "admin"].includes(org.role?.toLowerCase()),
+            org.role?.toLowerCase() === "owner",
         );
 
         if (!selectedOrganization) {

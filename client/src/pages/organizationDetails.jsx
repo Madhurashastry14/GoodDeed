@@ -216,7 +216,7 @@ export default function OrganizationDetails() {
         if (active) {
           setIsOwner(role === "owner");
 
-          setCanCreateOpportunity(role === "owner" || role === "admin");
+          setCanCreateOpportunity(role === "owner");
         }
       } catch (err) {
         console.error("Unable to check organization permissions:", err);
@@ -330,7 +330,7 @@ export default function OrganizationDetails() {
                 </a>
               )}
 
-              {/* Owner and admin actions */}
+              {/* Owner-only actions */}
               {canCreateOpportunity && (
                 <Link
                   to={`/organizations/${id}/opportunities/new`}
