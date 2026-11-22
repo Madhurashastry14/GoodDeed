@@ -21,6 +21,7 @@ import {
 import Navbar from "../components/navbar";
 import OpportunityOwnerActions from "../components/opportunityOwnerActions";
 import { useAuth } from "../context/authContext";
+import { useConfirm, useToast } from "../context/notificationContext";
 import {
   acceptApplication,
   applyToOpportunity,
@@ -52,6 +53,8 @@ export default function OpportunityDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const { accessToken, loading: authLoading } = useAuth();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [opportunity, setOpportunity] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -182,7 +185,14 @@ export default function OpportunityDetails() {
   async function handleApply() {
     if (!accessToken || !opportunity) return;
 
-    if (!window.confirm(`Apply to "${opportunity.title}"?`)) return;
+    const confirmed = await confirm({
+      title: "Apply for this opportunity?",
+      message: `Submit your application for "${opportunity.title}"?`,
+      confirmLabel: "Submit application",
+      tone: "primary",
+    });
+
+    if (!confirmed) return;
 
     setApplicationBusy(true);
     setApplicationError("");
@@ -196,8 +206,12 @@ export default function OpportunityDetails() {
         opportunity_id: opportunity.id,
       });
       setApplicationMessage("Your application has been submitted.");
+      toast.success("Application submitted successfully.");
     } catch (err) {
-      setApplicationError(err.message || "Unable to submit application");
+      const message = err.message || "Unable to submit application";
+
+      setApplicationError(message);
+      toast.error(message);
     } finally {
       setApplicationBusy(false);
     }
@@ -206,9 +220,16 @@ export default function OpportunityDetails() {
   async function handleWithdraw() {
     if (!accessToken || !myApplication) return;
 
-    if (!window.confirm("Withdraw your application for this opportunity?")) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: "Withdraw application?",
+      message:
+        "Your application will be withdrawn. If it was accepted, your volunteer spot will be released.",
+      confirmLabel: "Withdraw application",
+      cancelLabel: "Keep application",
+      tone: "danger",
+    });
+
+    if (!confirmed) return;
 
     const wasAccepted = myApplication.status === "accepted";
 
@@ -235,8 +256,12 @@ export default function OpportunityDetails() {
       }
 
       setApplicationMessage("Your application has been withdrawn.");
+      toast.success("Application withdrawn successfully.");
     } catch (err) {
-      setApplicationError(err.message || "Unable to withdraw application");
+      const message = err.message || "Unable to withdraw application";
+
+      setApplicationError(message);
+      toast.error(message);
     } finally {
       setApplicationBusy(false);
     }
@@ -246,14 +271,16 @@ export default function OpportunityDetails() {
     if (!accessToken || !opportunity) return;
 
     const label = action === "accept" ? "Accept" : "Reject";
+    const confirmed = await confirm({
+      title: `${label} applicant?`,
+      message: `${label} ${application.applicant_name}'s application?${
+        action === "accept" ? " This will count toward the opportunity capacity." : ""
+      }`,
+      confirmLabel: `${label} applicant`,
+      tone: action === "accept" ? "primary" : "danger",
+    });
 
-    if (
-      !window.confirm(
-        `${label} ${application.applicant_name}'s application?`,
-      )
-    ) {
-      return;
-    }
+    if (!confirmed) return;
 
     setApplicantBusy(`${action}-${application.id}`);
     setApplicantsError("");
@@ -283,8 +310,14 @@ export default function OpportunityDetails() {
       setApplicantMessage(
         `Application ${action === "accept" ? "accepted" : "rejected"}.`,
       );
+      toast.success(
+        `Application ${action === "accept" ? "accepted" : "rejected"}.`,
+      );
     } catch (err) {
-      setApplicantsError(err.message || "Unable to update application");
+      const message = err.message || "Unable to update application";
+
+      setApplicantsError(message);
+      toast.error(message);
     } finally {
       setApplicantBusy("");
     }

@@ -10,6 +10,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useToast } from "../context/notificationContext";
 import { getOpportunityById, updateOpportunity } from "../services/api";
 
 import "../styles/createOpportunity.css";
@@ -32,6 +33,7 @@ export default function EditOpportunity() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { accessToken, loading: authLoading } = useAuth();
+  const toast = useToast();
 
   const [form, setForm] = useState(null);
   const [opportunity, setOpportunity] = useState(null);
@@ -169,13 +171,17 @@ export default function EditOpportunity() {
         accessToken,
       );
 
+      toast.success("Opportunity updated successfully.");
       navigate(`/opportunities/${id}`, {
         state: {
           message: "Opportunity updated successfully.",
         },
       });
     } catch (err) {
-      setError(err.message || "Unable to update opportunity.");
+      const message = err.message || "Unable to update opportunity.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }

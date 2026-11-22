@@ -8,6 +8,7 @@ import {
   deleteOpportunity,
   publishOpportunity,
 } from "../services/api";
+import { useConfirm, useToast } from "../context/notificationContext";
 import "../styles/opportunityOwnerActions.css";
 
 export default function OpportunityOwnerActions({
@@ -20,6 +21,8 @@ export default function OpportunityOwnerActions({
 }) {
   const [busyAction, setBusyAction] = useState("");
   const [error, setError] = useState("");
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const canManage = isOwner ?? opportunity?.is_owner;
 
@@ -42,7 +45,9 @@ export default function OpportunityOwnerActions({
   }
 
   async function runAction(action, confirmation, request) {
-    if (!window.confirm(confirmation)) return;
+    const confirmed = await confirm(confirmation);
+
+    if (!confirmed) return;
 
     setBusyAction(action);
     setError("");
@@ -51,12 +56,23 @@ export default function OpportunityOwnerActions({
       const data = await request();
 
       if (action === "delete") {
+        toast.success("Draft opportunity deleted.");
         onDeleted?.(opportunity);
       } else {
+        const messages = {
+          publish: "Opportunity published successfully.",
+          complete: "Opportunity marked as completed.",
+          cancel: "Opportunity cancelled successfully.",
+        };
+
+        toast.success(messages[action] ?? "Opportunity updated successfully.");
         onUpdated?.(data.opportunity ?? data);
       }
     } catch (err) {
-      setError(err.message || "Unable to update opportunity");
+      const message = err.message || "Unable to update opportunity";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setBusyAction("");
     }
@@ -82,7 +98,12 @@ export default function OpportunityOwnerActions({
           onClick={() =>
             runAction(
               "publish",
-              `Publish "${opportunity.title}"? It will become visible to everyone.`,
+              {
+                title: "Publish opportunity?",
+                message: `Publish "${opportunity.title}"? It will become visible to everyone.`,
+                confirmLabel: "Publish",
+                tone: "primary",
+              },
               () => publishOpportunity(opportunity.id, accessToken),
             )
           }
@@ -100,7 +121,12 @@ export default function OpportunityOwnerActions({
           onClick={() =>
             runAction(
               "complete",
-              `Mark "${opportunity.title}" as completed? This cannot be undone.`,
+              {
+                title: "Mark opportunity as completed?",
+                message: `Mark "${opportunity.title}" as completed? This cannot be undone.`,
+                confirmLabel: "Mark completed",
+                tone: "primary",
+              },
               () => completeOpportunity(opportunity.id, accessToken),
             )
           }
@@ -118,7 +144,13 @@ export default function OpportunityOwnerActions({
           onClick={() =>
             runAction(
               "cancel",
-              `Cancel "${opportunity.title}"? This cannot be undone.`,
+              {
+                title: "Cancel opportunity?",
+                message: `Cancel "${opportunity.title}"? This cannot be undone. Existing applications will be preserved.`,
+                confirmLabel: "Cancel opportunity",
+                cancelLabel: "Keep opportunity",
+                tone: "danger",
+              },
               () => cancelOpportunity(opportunity.id, accessToken),
             )
           }
@@ -136,7 +168,13 @@ export default function OpportunityOwnerActions({
           onClick={() =>
             runAction(
               "delete",
-              `Delete draft "${opportunity.title}"? This cannot be undone.`,
+              {
+                title: "Delete draft opportunity?",
+                message: `Delete draft "${opportunity.title}"? This cannot be undone.`,
+                confirmLabel: "Delete draft",
+                cancelLabel: "Keep draft",
+                tone: "danger",
+              },
               () => deleteOpportunity(opportunity.id, accessToken),
             )
           }

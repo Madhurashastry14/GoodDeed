@@ -10,6 +10,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useToast } from "../context/notificationContext";
 import { createOpportunity, getMyOrganizations } from "../services/api";
 
 import "../styles/createOpportunity.css";
@@ -27,6 +28,7 @@ export default function CreateOpportunity() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { accessToken, loading: authLoading } = useAuth();
+  const toast = useToast();
 
   const [form, setForm] = useState(initialForm);
   const [organization, setOrganization] = useState(null);
@@ -160,13 +162,17 @@ export default function CreateOpportunity() {
         accessToken,
       );
 
+      toast.success("Opportunity created as a draft.");
       navigate(`/organizations/${id}`, {
         state: {
           message: "Opportunity created as a draft.",
         },
       });
     } catch (err) {
-      setError(err.message || "Unable to create opportunity.");
+      const message = err.message || "Unable to create opportunity.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }

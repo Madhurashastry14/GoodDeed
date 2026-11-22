@@ -10,6 +10,7 @@ import {
 
 import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
+import { useConfirm, useToast } from "../context/notificationContext";
 import { getMyApplications, withdrawApplication } from "../services/api";
 import "../styles/myActivities.css";
 
@@ -28,6 +29,8 @@ function formatDateTime(value) {
 
 export default function MyActivities() {
   const { accessToken, loading: authLoading } = useAuth();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,13 +73,15 @@ export default function MyActivities() {
   async function handleWithdraw(application) {
     if (!accessToken) return;
 
-    if (
-      !window.confirm(
-        `Withdraw your application for "${application.opportunity_title}"?`,
-      )
-    ) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: "Withdraw application?",
+      message: `Withdraw your application for "${application.opportunity_title}"?`,
+      confirmLabel: "Withdraw application",
+      cancelLabel: "Keep application",
+      tone: "danger",
+    });
+
+    if (!confirmed) return;
 
     setBusyId(application.id);
     setError("");
@@ -93,8 +98,12 @@ export default function MyActivities() {
         ),
       );
       setMessage("Your application has been withdrawn.");
+      toast.success("Application withdrawn successfully.");
     } catch (err) {
-      setError(err.message || "Unable to withdraw application");
+      const message = err.message || "Unable to withdraw application";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setBusyId("");
     }
