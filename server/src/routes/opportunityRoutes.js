@@ -5,6 +5,8 @@ const opportunityController = require("../controller/opportunityController");
 
 const Middleware = require("../middleware/authMiddleware");
 
+router.get("/", opportunityController.getPublicOpportunities);
+
 router.post(
   "/",
   Middleware.authMiddleware,

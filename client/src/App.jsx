@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/protectedRoute";
 import ComingSoon from "./components/comingSoon";
 
 import CreateOpportunity from "./pages/createOpportunity";
+import Opportunities from "./pages/opportunities";
 import OpportunityDetails from "./pages/opportunityDetails";
 import EditOpportunity from "./pages/editOpportunity";
 
@@ -87,6 +88,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/opportunities/:id" element={<OpportunityDetails />} />
         <Route
           path="/opportunities/:id/edit"

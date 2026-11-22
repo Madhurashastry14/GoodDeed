@@ -107,7 +107,9 @@ export default function Navbar() {
                   >
                     <Icon size={18} />
                     <span>{label}</span>
-                    <span className="gd-soon">Soon</span>
+                    {path !== "/opportunities" && (
+                      <span className="gd-soon">Soon</span>
+                    )}
                   </Link>
                 ))}
               </div>

@@ -69,6 +69,7 @@ async function insertOpportunity({
   startHours = 24,
   endHours = 28,
   capacity = 5,
+  city = "Test City",
 } = {}) {
   const id = randomUUID();
 
@@ -83,7 +84,7 @@ async function insertOpportunity({
       organizationId,
       title || `Fixture ${id}`,
       "Fixture description",
-      "Test City",
+      city,
       futureIso(startHours),
       futureIso(endHours),
       capacity,
@@ -477,4 +478,121 @@ test("owner can delete a draft opportunity", async () => {
   });
 
   assert.equal(response.status, 404);
+});
+
+test("public listing includes only published opportunities", async () => {
+  const publishedId = await insertOpportunity({
+    status: "published",
+    title: "Beach Cleanup Alpha",
+    city: "Alpha City",
+  });
+  const draftId = await insertOpportunity({
+    status: "draft",
+    title: "Beach Cleanup Alpha Draft",
+    city: "Alpha City",
+  });
+  const cancelledId = await insertOpportunity({
+    status: "cancelled",
+    title: "Beach Cleanup Alpha Cancelled",
+    city: "Alpha City",
+  });
+  const completedId = await insertOpportunity({
+    status: "completed",
+    title: "Beach Cleanup Alpha Completed",
+    city: "Alpha City",
+  });
+
+  const response = await api(
+    "/opportunities?search=Beach Cleanup Alpha&limit=50",
+  );
+
+  assert.equal(response.status, 200);
+
+  const ids = response.data.opportunities.map((item) => item.id);
+
+  assert.ok(ids.includes(publishedId));
+  assert.ok(!ids.includes(draftId));
+  assert.ok(!ids.includes(cancelledId));
+  assert.ok(!ids.includes(completedId));
+});
+
+test("public listing can filter by city", async () => {
+  const response = await api("/opportunities?city=Alpha City&limit=50");
+
+  assert.equal(response.status, 200);
+  assert.ok(
+    response.data.opportunities.every(
+      (item) => item.city.toLowerCase() === "alpha city",
+    ),
+  );
+});
+
+test("public listing can filter to upcoming opportunities", async () => {
+  const pastId = await insertOpportunity({
+    status: "published",
+    title: "Beach Beta Past",
+    startHours: -8,
+    endHours: -4,
+  });
+  const futureId = await insertOpportunity({
+    status: "published",
+    title: "Beach Beta Future",
+    startHours: 24,
+    endHours: 28,
+  });
+
+  const response = await api(
+    "/opportunities?search=Beach Beta&upcoming=true&limit=50",
+  );
+
+  assert.equal(response.status, 200);
+
+  const ids = response.data.opportunities.map((item) => item.id);
+
+  assert.ok(ids.includes(futureId));
+  assert.ok(!ids.includes(pastId));
+});
+
+test("public listing can sort by start date", async () => {
+  const response = await api(
+    "/opportunities?search=Beach Beta&sort=start_desc&limit=50",
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.data.opportunities.length, 2);
+
+  const [first, second] = response.data.opportunities;
+
+  assert.ok(new Date(first.starts_at) > new Date(second.starts_at));
+});
+
+test("public listing supports pagination", async () => {
+  for (let index = 0; index < 3; index += 1) {
+    await insertOpportunity({
+      status: "published",
+      title: `Page Gamma ${index}`,
+      startHours: 24 + index,
+      endHours: 28 + index,
+    });
+  }
+
+  const firstPage = await api(
+    "/opportunities?search=Page Gamma&limit=2&page=1",
+  );
+  const secondPage = await api(
+    "/opportunities?search=Page Gamma&limit=2&page=2",
+  );
+
+  assert.equal(firstPage.status, 200);
+  assert.equal(firstPage.data.total, 3);
+  assert.equal(firstPage.data.opportunities.length, 2);
+  assert.equal(secondPage.data.opportunities.length, 1);
+});
+
+test("public listing rejects invalid filters", async () => {
+  const badSort = await api("/opportunities?sort=invalid");
+  const badLimit = await api("/opportunities?limit=999");
+
+  assert.equal(badSort.status, 400);
+  assert.equal(badLimit.status, 400);
 });

@@ -133,6 +133,65 @@ async function getOrganizationOpportunities(organizationId, userId = null) {
   return result.rows;
 }
 
+async function getPublicOpportunities({
+  search = null,
+  city = null,
+  upcoming = false,
+  sort = "start_asc",
+  page = 1,
+  limit = 9,
+} = {}) {
+  const orderBy =
+    sort === "start_desc" ? "o.starts_at DESC" : "o.starts_at ASC";
+
+  const offset = (page - 1) * limit;
+
+  const result = await pool.query(
+    `SELECT
+       o.id,
+       o.organization_id,
+       o.title,
+       o.description,
+       o.city,
+       o.starts_at,
+       o.ends_at,
+       o.capacity,
+       o.status,
+       o.created_at,
+       org.name AS organization_name,
+       org.city AS organization_city,
+       COALESCE(
+         (
+           SELECT COUNT(*)::int
+           FROM applications a
+           WHERE a.opportunity_id = o.id AND a.status = 'accepted'
+         ),
+         0
+       ) AS accepted_count,
+       COUNT(*) OVER()::int AS total_count
+     FROM opportunities o
+     JOIN organizations org ON org.id = o.organization_id
+     WHERE o.status = 'published'
+       AND (
+         $1::text IS NULL
+         OR o.title ILIKE '%' || $1 || '%'
+         OR o.description ILIKE '%' || $1 || '%'
+         OR org.name ILIKE '%' || $1 || '%'
+       )
+       AND ($2::text IS NULL OR LOWER(o.city) = LOWER($2))
+       AND ($3::boolean = FALSE OR o.starts_at >= NOW())
+     ORDER BY ${orderBy}
+     LIMIT $4 OFFSET $5`,
+    [search, city, upcoming, limit, offset],
+  );
+
+  const total = result.rows[0]?.total_count ?? 0;
+
+  const opportunities = result.rows.map(({ total_count, ...row }) => row);
+
+  return { opportunities, total, page, limit };
+}
+
 function httpError(statusCode, message) {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -599,6 +658,7 @@ async function deleteOpportunity(opportunityId, userId) {
 module.exports = {
   createOpportunity,
   getOrganizationOpportunities,
+  getPublicOpportunities,
   getOpportunityById,
   updateOpportunity,
   publishOpportunity,

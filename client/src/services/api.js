@@ -280,6 +280,29 @@ export async function getOrganizationOpportunities(
   return data;
 }
 
+export async function getPublicOpportunities(filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const query = params.toString();
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities${query ? `?${query}` : ""}`,
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch opportunities");
+  }
+
+  return data;
+}
+
 export async function getOpportunityById(opportunityId, accessToken) {
   const response = await fetch(
     `http://localhost:3000/api/opportunities/${opportunityId}`,

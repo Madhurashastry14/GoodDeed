@@ -24,7 +24,7 @@ const actions = [
     icon: HandHeart,
     path: "/opportunities",
     color: "green",
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     title: "Share free items",

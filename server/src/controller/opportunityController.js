@@ -134,6 +134,80 @@ async function getOrganizationOpportunities(req, res) {
   }
 }
 
+async function getPublicOpportunities(req, res) {
+  try {
+    const { search, city, upcoming, sort, page, limit } = req.query;
+
+    for (const [name, value] of Object.entries({ search, city })) {
+      if (value !== undefined && typeof value !== "string") {
+        return res.status(400).json({
+          error: `Invalid ${name} filter`,
+        });
+      }
+    }
+
+    if (search !== undefined && search.trim().length > 100) {
+      return res.status(400).json({
+        error: "Search query must be 100 characters or fewer",
+      });
+    }
+
+    if (city !== undefined && city.trim().length > 100) {
+      return res.status(400).json({
+        error: "City filter must be 100 characters or fewer",
+      });
+    }
+
+    if (upcoming !== undefined && !["true", "false"].includes(upcoming)) {
+      return res.status(400).json({
+        error: "Upcoming filter must be true or false",
+      });
+    }
+
+    if (sort !== undefined && !["start_asc", "start_desc"].includes(sort)) {
+      return res.status(400).json({
+        error: "Sort must be start_asc or start_desc",
+      });
+    }
+
+    const parsedPage = page === undefined ? 1 : Number(page);
+    const parsedLimit = limit === undefined ? 9 : Number(limit);
+
+    if (!Number.isInteger(parsedPage) || parsedPage < 1) {
+      return res.status(400).json({
+        error: "Page must be a positive integer",
+      });
+    }
+
+    if (
+      !Number.isInteger(parsedLimit) ||
+      parsedLimit < 1 ||
+      parsedLimit > 50
+    ) {
+      return res.status(400).json({
+        error: "Limit must be an integer between 1 and 50",
+      });
+    }
+
+    const result = await opportunityService.getPublicOpportunities({
+      search: search?.trim() || null,
+      city: city?.trim() || null,
+      upcoming: upcoming === "true",
+      sort: sort || "start_asc",
+      page: parsedPage,
+      limit: parsedLimit,
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Get public opportunities failed:", error);
+
+    return res.status(500).json({
+      error: "Unable to fetch opportunities",
+    });
+  }
+}
+
 async function getOpportunity(req, res) {
   try {
     const { id } = req.params;
@@ -404,6 +478,7 @@ async function deleteOpportunity(req, res) {
 
 module.exports = {
   createOpportunity,
+  getPublicOpportunities,
   getOrganizationOpportunities,
   getOpportunity,
   patchOpportunity,
