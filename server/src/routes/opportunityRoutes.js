@@ -3,13 +3,17 @@ const router = express.Router();
 
 const opportunityController = require("../controller/opportunityController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+const Middleware = require("../middleware/authMiddleware");
 
-router.post("/", authMiddleware, opportunityController.createOpportunity);
+router.post(
+  "/",
+  Middleware.authMiddleware,
+  opportunityController.createOpportunity,
+);
 
 router.get(
   "/organization/:id",
-  authMiddleware,
+  Middleware.optionalAuthMiddleware,
   opportunityController.getOrganizationOpportunities,
 );
 
