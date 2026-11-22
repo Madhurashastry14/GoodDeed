@@ -210,9 +210,8 @@ export default function Dashboard() {
                 <h3>Your journey is just beginning</h3>
 
                 <p>
-                  Your volunteering applications, item sharing, and community
-                  activities will appear here when these features become
-                  available.
+                  Track your volunteer applications, their status, and the
+                  opportunities you have joined.
                 </p>
 
                 <Link to="/my-activities">

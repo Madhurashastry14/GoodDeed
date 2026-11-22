@@ -248,6 +248,258 @@
   }
 }
 
+.opp-action-card {
+  margin-top: 30px;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.opp-action-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+  color: #176c3b;
+}
+
+.opp-action-heading h2 {
+  margin: 4px 0 0;
+  color: #193d29;
+  font-family: "Manrope", sans-serif;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.opp-action-text {
+  margin: 0;
+  color: #697b6d;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.opp-action-link {
+  color: #176c3b;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.opp-action-link:hover {
+  text-decoration: underline;
+}
+
+.opp-action-success {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-action-error {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #ffd5d2;
+  border-radius: 9px;
+  background: #fff1f0;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opp-apply-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.opp-apply-btn,
+.opp-secondary-btn {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opp-apply-btn:hover,
+.opp-secondary-btn:hover {
+  background: #11552e;
+}
+
+.opp-apply-btn:disabled,
+.opp-secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.opp-secondary-btn {
+  margin-top: 14px;
+  border: 1px solid #cfe0cd;
+  background: #fff;
+  color: #176c3b;
+}
+
+.opp-secondary-btn:hover {
+  background: #f0f7ef;
+}
+
+.opp-my-application p {
+  margin: 0 0 8px;
+  color: #697b6d;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.opp-app-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ec;
+  color: #5f7263;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.opp-app-status.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.opp-app-status.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.opp-app-status.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.opp-app-status.status-withdrawn {
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.opp-app-status.status-waitlisted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.opp-applicants-summary {
+  margin: 0 0 18px;
+  color: #56715d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.opp-applicant-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.opp-applicant-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #edf1ec;
+}
+
+.opp-applicant-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.opp-applicant-avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e8f3e9;
+  color: #176c3b;
+}
+
+.opp-applicant-person > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.opp-applicant-person strong {
+  color: #25432e;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.opp-applicant-person span {
+  color: #819083;
+  font-size: 11px;
+}
+
+.opp-applicant-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.opp-app-accept,
+.opp-app-reject {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid #cfe0cd;
+  border-radius: 8px;
+  background: #fff;
+  color: #176c3b;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opp-app-accept:hover {
+  background: #f0f7ef;
+}
+
+.opp-app-reject {
+  border-color: #f0c9c5;
+  color: #b42318;
+}
+
+.opp-app-reject:hover {
+  background: #fff1f0;
+}
+
+.opp-app-accept:disabled,
+.opp-app-reject:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 480px) {
   .opp-detail-container {
     padding: 25px 16px 60px;
@@ -257,7 +509,16 @@
     padding: 25px;
   }
 
-  .opp-detail-card {
+  .opp-detail-card,
+  .opp-action-card {
     padding: 23px;
+  }
+
+  .opp-applicant-row {
+    flex-wrap: wrap;
+  }
+
+  .opp-applicant-actions {
+    width: 100%;
   }
 }

@@ -18,6 +18,7 @@ import CreateOpportunity from "./pages/createOpportunity";
 import Opportunities from "./pages/opportunities";
 import OpportunityDetails from "./pages/opportunityDetails";
 import EditOpportunity from "./pages/editOpportunity";
+import MyActivities from "./pages/myActivities";
 
 export default function App() {
   return (
@@ -119,7 +120,7 @@ export default function App() {
           path="/my-activities"
           element={
             <ProtectedRoute>
-              <ComingSoon title="My Activities" />
+              <MyActivities />
             </ProtectedRoute>
           }
         />

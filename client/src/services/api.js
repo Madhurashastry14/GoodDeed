@@ -456,3 +456,129 @@ export async function createOpportunity(opportunityData, accessToken) {
 
   return data;
 }
+
+export async function applyToOpportunity(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}/applications`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to submit application");
+  }
+
+  return data;
+}
+
+export async function getMyApplications(accessToken) {
+  const response = await fetch(
+    "http://localhost:3000/api/opportunity-applications/mine",
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch applications");
+  }
+
+  return data;
+}
+
+export async function getOpportunityApplications(opportunityId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunities/${opportunityId}/applications`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch applicants");
+  }
+
+  return data;
+}
+
+export async function acceptApplication(applicationId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunity-applications/${applicationId}/accept`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to accept application");
+  }
+
+  return data;
+}
+
+export async function rejectApplication(applicationId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunity-applications/${applicationId}/reject`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to reject application");
+  }
+
+  return data;
+}
+
+export async function withdrawApplication(applicationId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/opportunity-applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to withdraw application");
+  }
+
+  return data;
+}

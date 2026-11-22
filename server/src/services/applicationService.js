@@ -124,6 +124,8 @@ async function getMyApplications(userId) {
        o.starts_at,
        o.ends_at,
        o.status AS opportunity_status,
+       (a.status IN ('pending', 'accepted') AND o.starts_at > NOW())
+         AS can_withdraw,
        org.id AS organization_id,
        org.name AS organization_name
      FROM applications a

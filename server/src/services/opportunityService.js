@@ -214,6 +214,7 @@ async function getOpportunityById(opportunityId, userId = null) {
        o.created_at,
        o.updated_at,
        (o.ends_at <= NOW()) AS can_complete,
+       (o.status = 'published' AND o.starts_at > NOW()) AS applications_open,
        org.name AS organization_name,
        org.city AS organization_city,
        COALESCE(

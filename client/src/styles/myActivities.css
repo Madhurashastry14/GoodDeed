@@ -1,0 +1,287 @@
+.my-act-page {
+  min-height: 100vh;
+  background: #fafbf7;
+  color: #193d29;
+  font-family: "DM Sans", sans-serif;
+}
+
+.my-act-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 45px 24px 90px;
+}
+
+.my-act-hero {
+  padding: 35px 0 30px;
+}
+
+.my-act-eyebrow {
+  display: block;
+  color: #176c3b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.my-act-hero h1 {
+  margin: 0 0 14px;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(34px, 4vw, 48px);
+  letter-spacing: -1.5px;
+}
+
+.my-act-hero p {
+  max-width: 560px;
+  margin: 0;
+  color: #718173;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.my-act-section {
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e3ebe2;
+  border-radius: 16px;
+}
+
+.my-act-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+  color: #176c3b;
+}
+
+.my-act-heading h2 {
+  margin: 0;
+  color: #193d29;
+  font-family: "Manrope", sans-serif;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+
+.my-act-success {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border: 1px solid #cfe8d4;
+  border-radius: 9px;
+  background: #eef8ef;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.my-act-error {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border: 1px solid #ffd5d2;
+  border-radius: 9px;
+  background: #fff1f0;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.my-act-status {
+  margin: 0;
+  color: #758376;
+  font-size: 13px;
+}
+
+.my-act-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 55px 20px;
+  border: 1px dashed #d7e4d6;
+  border-radius: 14px;
+  text-align: center;
+  color: #758376;
+}
+
+.my-act-empty svg {
+  color: #176c3b;
+}
+
+.my-act-empty h3 {
+  margin: 0;
+  color: #193d29;
+}
+
+.my-act-empty p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.my-act-empty a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  color: #176c3b;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.my-act-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.my-act-card {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px;
+  border: 1px solid #e7eee5;
+  border-radius: 13px;
+  background: #fcfdfb;
+}
+
+.my-act-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-act-card-top {
+  margin-bottom: 9px;
+}
+
+.my-act-status-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ec;
+  color: #5f7263;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.my-act-status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.my-act-status-badge.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.my-act-status-badge.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.my-act-status-badge.status-withdrawn {
+  background: #eef2ec;
+  color: #5f7263;
+}
+
+.my-act-card h3 {
+  margin: 0 0 7px;
+  font-family: "Manrope", sans-serif;
+  font-size: 18px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.my-act-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #477a55;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.my-act-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: #7b8b7d;
+  font-size: 11px;
+}
+
+.my-act-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.my-act-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.my-act-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #176c3b;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.my-act-view:hover {
+  text-decoration: underline;
+}
+
+.my-act-withdraw {
+  padding: 8px 12px;
+  border: 1px solid #f0c9c5;
+  border-radius: 8px;
+  background: #fff;
+  color: #b42318;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.my-act-withdraw:hover {
+  background: #fff1f0;
+}
+
+.my-act-withdraw:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .my-act-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-act-card-actions {
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #edf1ec;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-act-container {
+    padding: 25px 16px 60px;
+  }
+
+  .my-act-section {
+    padding: 22px;
+  }
+}
