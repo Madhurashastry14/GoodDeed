@@ -446,3 +446,36 @@ test("opportunity counts update after publishing and cancelling", async () => {
     ),
   );
 });
+
+test("completed counts update when a finished opportunity is completed", async () => {
+  const pastPublishedId = await insertOpportunity({
+    title: "Dashboard Past Published",
+    status: "published",
+    startHours: -8,
+    endHours: -4,
+  });
+
+  let response = await getDashboard();
+
+  assert.equal(response.data.statistics.total_opportunities, 6);
+  assert.equal(response.data.statistics.published_opportunities, 3);
+  assert.equal(response.data.statistics.completed_opportunities, 1);
+  assert.ok(
+    !response.data.upcoming_opportunities.some(
+      (item) => item.id === pastPublishedId,
+    ),
+  );
+
+  const completed = await api(`/opportunities/${pastPublishedId}/complete`, {
+    method: "PATCH",
+    token: tokenFor(owner),
+  });
+
+  assert.equal(completed.status, 200, JSON.stringify(completed.data));
+
+  response = await getDashboard();
+
+  assert.equal(response.data.statistics.published_opportunities, 2);
+  assert.equal(response.data.statistics.completed_opportunities, 2);
+  assert.equal(response.data.statistics.upcoming_published_opportunities, 2);
+});
