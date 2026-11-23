@@ -85,19 +85,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 13px 18px;
+  gap: 8px;
+  padding: 11px 16px;
+  border: 1px solid #cfe0cd;
   border-radius: 9px;
-  background: #176c3b;
-  color: white;
+  background: #ffffff;
+  color: #176c3b;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .org-website-btn:hover {
-  background: #11552e;
+  background: #f0f7ef;
+  border-color: #b7d3b8;
 }
 
 .org-detail-grid {
@@ -220,10 +225,6 @@
   .org-detail-hero {
     flex-wrap: wrap;
   }
-
-  .org-website-btn {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
@@ -252,40 +253,8 @@
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   margin-left: auto;
-}
-
-.org-edit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 12px 18px;
-  border: 1px solid #176c3b;
-  border-radius: 9px;
-  background: #176c3b;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
-}
-
-.org-edit-btn:hover {
-  background: #11552e;
-  border-color: #11552e;
-}
-
-@media (max-width: 750px) {
-  .org-detail-actions {
-    justify-content: flex-start;
-    width: 100%;
-    margin-left: 0;
-  }
 }
 
 .org-create-opp-btn {
@@ -306,6 +275,112 @@
 
 .org-create-opp-btn:hover {
   background: #11552e;
+}
+
+.org-actions-menu {
+  position: relative;
+}
+
+.org-more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border: 1px solid #cfe0cd;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #176c3b;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.org-more-btn:hover,
+.org-more-btn.is-open {
+  background: #f0f7ef;
+  border-color: #b7d3b8;
+}
+
+.org-more-caret {
+  transition: transform 0.2s ease;
+}
+
+.org-more-btn.is-open .org-more-caret {
+  transform: rotate(180deg);
+}
+
+.org-actions-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #e3ebe2;
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(25, 61, 41, 0.14);
+}
+
+.org-actions-panel a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #25432e;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.org-actions-panel a svg {
+  flex-shrink: 0;
+  color: #477a55;
+}
+
+.org-actions-panel a:hover,
+.org-actions-panel a:focus-visible {
+  background: #f2f7f1;
+  color: #176c3b;
+  outline: none;
+}
+
+@media (max-width: 750px) {
+  .org-detail-actions {
+    justify-content: flex-start;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .org-actions-menu {
+    display: flex;
+  }
+
+  .org-more-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .org-actions-menu {
+    flex: 1 1 100%;
+  }
+
+  .org-actions-panel {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
 }
 
 /* Organization opportunities */
