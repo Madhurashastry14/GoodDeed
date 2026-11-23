@@ -19,6 +19,7 @@ import Opportunities from "./pages/opportunities";
 import OpportunityDetails from "./pages/opportunityDetails";
 import EditOpportunity from "./pages/editOpportunity";
 import MyActivities from "./pages/myActivities";
+import OwnerDashboard from "./pages/ownerDashboard";
 
 export default function App() {
   return (
@@ -49,6 +50,14 @@ export default function App() {
           }
         />
         <Route path="/organizations/:id" element={<OrganizationDetails />} />
+        <Route
+          path="/organizations/:id/dashboard"
+          element={
+            <ProtectedRoute>
+              <OwnerDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/organizations/:id/edit"
           element={

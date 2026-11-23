@@ -11,6 +11,7 @@ import {
   Plus,
   CalendarDays,
   Clock,
+  LayoutDashboard,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
@@ -348,6 +349,17 @@ export default function OrganizationDetails() {
                 >
                   <Plus size={17} />
                   Create Opportunity
+                </Link>
+              )}
+
+              {/* Owner-only actions */}
+              {isOwner && (
+                <Link
+                  to={`/organizations/${id}/dashboard`}
+                  className="org-edit-btn"
+                >
+                  <LayoutDashboard size={16} />
+                  Owner dashboard
                 </Link>
               )}
 
