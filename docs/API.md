@@ -67,6 +67,7 @@ Sensitive account information must not be exposed through public profile endpoin
 | POST   | `/organizations`                        | Authenticated | Create an organization                   |
 | GET    | `/organizations/mine`                   | Authenticated | List the current user's organizations    |
 | GET    | `/organizations/:id`                    | Public        | Retrieve organization details            |
+| GET    | `/organizations/:id/dashboard`          | Owner         | Owner dashboard statistics               |
 | GET    | `/organizations/:id/members`            | Public        | List organization members                |
 | PATCH  | `/organizations/:id`                    | Owner         | Update organization details              |
 | DELETE | `/organizations/:id`                    | owner         | Delete a organizations                   |
@@ -75,6 +76,55 @@ Sensitive account information must not be exposed through public profile endpoin
 | PATCH  | `/admin/organizations/:id/verification` | Admin         | Approve or reject verification           |
 
 \*Verify implementation and response behavior.
+
+### 5.1 Organization Owner Dashboard
+
+**Status: Implemented.**
+
+`GET /organizations/:id/dashboard` returns summary statistics for one
+organization. It requires authentication and is restricted to the
+organization **owner**; admins, members, and unrelated users receive `403`.
+
+The response is a single JSON object:
+
+```json
+{
+  "organization": { "id": "...", "name": "...", "city": "..." },
+  "statistics": {
+    "total_opportunities": 0,
+    "draft_opportunities": 0,
+    "published_opportunities": 0,
+    "completed_opportunities": 0,
+    "cancelled_opportunities": 0,
+    "pending_applications": 0,
+    "accepted_applications": 0,
+    "unique_accepted_volunteers": 0,
+    "upcoming_published_opportunities": 0
+  },
+  "upcoming_opportunities": [],
+  "pending_application_opportunities": []
+}
+```
+
+Metric definitions:
+
+- `total_opportunities` counts every opportunity owned by the organization,
+  across all statuses.
+- `upcoming_published_opportunities` counts `published` opportunities whose
+  `starts_at` is in the future.
+- `pending_applications` counts applications with status `pending` across the
+  organization's opportunities.
+- `accepted_applications` counts accepted application **records**. A volunteer
+  accepted for two opportunities contributes two.
+- `unique_accepted_volunteers` counts distinct users with at least one accepted
+  application. The same volunteer accepted for two opportunities contributes
+  one. This is the "total accepted volunteers" figure.
+
+`upcoming_opportunities` lists future `published` opportunities ordered by
+start time, with `accepted_count` and `pending_application_count` per
+opportunity. `pending_application_opportunities` groups opportunities that
+currently have pending applications, with `pending_application_count`. Neither
+list exposes volunteer names, emails, or other personal data.
 
 ## 6. Organization Membership
 

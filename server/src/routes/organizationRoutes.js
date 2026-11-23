@@ -19,6 +19,11 @@ router.get(
   Middleware.authMiddleware,
   organizationController.getMyOrganization,
 );
+router.get(
+  "/:id/dashboard",
+  Middleware.authMiddleware,
+  organizationController.getOrganizationDashboard,
+);
 router.get("/:id", organizationController.getOrganizationById);
 router.delete(
   "/:id",

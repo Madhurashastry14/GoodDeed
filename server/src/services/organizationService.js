@@ -88,6 +88,124 @@ async function getMyOrganizations(userId) {
   return result.rows;
 }
 
+// Owner-only summary statistics.
+//
+// `accepted_applications` counts accepted application rows across all
+// opportunities. `unique_accepted_volunteers` counts distinct users with at
+// least one accepted application, so a volunteer accepted for two
+// opportunities contributes twice to the first metric and once to the second.
+async function getOrganizationDashboard(organizationId, userId) {
+  const organizationResult = await pool.query(
+    `SELECT o.id, o.name, o.city, om.role
+     FROM organizations o
+     LEFT JOIN organization_members om
+       ON om.organization_id = o.id AND om.user_id = $2
+     WHERE o.id = $1`,
+    [organizationId, userId],
+  );
+
+  if (organizationResult.rows.length === 0) {
+    const error = new Error("Organization not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const organization = organizationResult.rows[0];
+
+  if (organization.role !== "owner") {
+    const error = new Error(
+      "Only the organization owner can view the dashboard",
+    );
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const opportunityStats = await pool.query(
+    `SELECT
+       COUNT(*)::int AS total_opportunities,
+       COUNT(*) FILTER (WHERE status = 'draft')::int
+         AS draft_opportunities,
+       COUNT(*) FILTER (WHERE status = 'published')::int
+         AS published_opportunities,
+       COUNT(*) FILTER (WHERE status = 'completed')::int
+         AS completed_opportunities,
+       COUNT(*) FILTER (WHERE status = 'cancelled')::int
+         AS cancelled_opportunities,
+       COUNT(*) FILTER (
+         WHERE status = 'published' AND starts_at > NOW()
+       )::int AS upcoming_published_opportunities
+     FROM opportunities
+     WHERE organization_id = $1`,
+    [organizationId],
+  );
+
+  const applicationStats = await pool.query(
+    `SELECT
+       COUNT(*) FILTER (WHERE a.status = 'pending')::int
+         AS pending_applications,
+       COUNT(*) FILTER (WHERE a.status = 'accepted')::int
+         AS accepted_applications,
+       COUNT(DISTINCT a.user_id) FILTER (WHERE a.status = 'accepted')::int
+         AS unique_accepted_volunteers
+     FROM applications a
+     JOIN opportunities o ON o.id = a.opportunity_id
+     WHERE o.organization_id = $1`,
+    [organizationId],
+  );
+
+  const upcoming = await pool.query(
+    `SELECT
+       o.id,
+       o.title,
+       o.city,
+       o.capacity,
+       o.starts_at,
+       o.ends_at,
+       COUNT(*) FILTER (WHERE a.status = 'accepted')::int
+         AS accepted_count,
+       COUNT(*) FILTER (WHERE a.status = 'pending')::int
+         AS pending_application_count
+     FROM opportunities o
+     LEFT JOIN applications a ON a.opportunity_id = o.id
+     WHERE o.organization_id = $1
+       AND o.status = 'published'
+       AND o.starts_at > NOW()
+     GROUP BY o.id
+     ORDER BY o.starts_at ASC`,
+    [organizationId],
+  );
+
+  const pendingGroups = await pool.query(
+    `SELECT
+       o.id,
+       o.title,
+       o.starts_at,
+       o.status,
+       COUNT(*)::int AS pending_application_count
+     FROM opportunities o
+     JOIN applications a
+       ON a.opportunity_id = o.id AND a.status = 'pending'
+     WHERE o.organization_id = $1
+     GROUP BY o.id
+     ORDER BY o.starts_at ASC`,
+    [organizationId],
+  );
+
+  return {
+    organization: {
+      id: organization.id,
+      name: organization.name,
+      city: organization.city,
+    },
+    statistics: {
+      ...opportunityStats.rows[0],
+      ...applicationStats.rows[0],
+    },
+    upcoming_opportunities: upcoming.rows,
+    pending_application_opportunities: pendingGroups.rows,
+  };
+}
+
 async function getOrganizationMembers(organizationId) {
   const result = await pool.query(
     "SELECT u.id, u.name, om.role, u.created_at FROM organization_members om JOIN users u ON u.id=om.user_id WHERE om.organization_id=$1",
@@ -241,6 +359,7 @@ module.exports = {
   getOrganization,
   getOrganizationById,
   getMyOrganizations,
+  getOrganizationDashboard,
   getOrganizationMembers,
   addOrganizationMember,
   removeMemberFromOrganization,
