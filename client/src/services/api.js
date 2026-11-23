@@ -121,6 +121,27 @@ export async function getMyOrganizations(accessToken) {
   return data;
 }
 
+export async function getOrganizationDashboard(organizationId, accessToken) {
+  const response = await fetch(
+    `http://localhost:3000/api/organizations/${organizationId}/dashboard`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch organization dashboard");
+  }
+
+  return data;
+}
+
 export async function getMyProfile(accessToken) {
   const response = await fetch("http://localhost:3000/api/users/profile", {
     headers: {

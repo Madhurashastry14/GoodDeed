@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -37,6 +37,7 @@ export default function MyActivities() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busyId, setBusyId] = useState("");
+  const withdrawInFlight = useRef(false);
 
   useEffect(() => {
     if (authLoading || !accessToken) return;
@@ -71,23 +72,25 @@ export default function MyActivities() {
   }, [accessToken, authLoading]);
 
   async function handleWithdraw(application) {
-    if (!accessToken) return;
+    if (!accessToken || withdrawInFlight.current) return;
 
-    const confirmed = await confirm({
-      title: "Withdraw application?",
-      message: `Withdraw your application for "${application.opportunity_title}"?`,
-      confirmLabel: "Withdraw application",
-      cancelLabel: "Keep application",
-      tone: "danger",
-    });
-
-    if (!confirmed) return;
-
-    setBusyId(application.id);
-    setError("");
-    setMessage("");
+    withdrawInFlight.current = true;
 
     try {
+      const confirmed = await confirm({
+        title: "Withdraw application?",
+        message: `Withdraw your application for "${application.opportunity_title}"?`,
+        confirmLabel: "Withdraw application",
+        cancelLabel: "Keep application",
+        tone: "danger",
+      });
+
+      if (!confirmed) return;
+
+      setBusyId(application.id);
+      setError("");
+      setMessage("");
+
       const data = await withdrawApplication(application.id, accessToken);
 
       setApplications((previous) =>
@@ -99,12 +102,24 @@ export default function MyActivities() {
       );
       setMessage("Your application has been withdrawn.");
       toast.success("Application withdrawn successfully.");
+
+      // Refresh from the server so the list reflects the stored status.
+      try {
+        const refreshed = await getMyApplications(accessToken);
+
+        setApplications(
+          Array.isArray(refreshed.applications) ? refreshed.applications : [],
+        );
+      } catch {
+        // Keep the optimistic update if the refresh fails.
+      }
     } catch (err) {
       const message = err.message || "Unable to withdraw application";
 
       setError(message);
       toast.error(message);
     } finally {
+      withdrawInFlight.current = false;
       setBusyId("");
     }
   }
@@ -174,10 +189,24 @@ export default function MyActivities() {
                   <article className="my-act-card" key={application.id}>
                     <div className="my-act-card-main">
                       <div className="my-act-card-top">
-                        <span
-                          className={`my-act-status-badge status-${application.status}`}
-                        >
-                          {application.status}
+                        <span className="my-act-badge-group">
+                          <span className="my-act-badge-label">Application</span>
+
+                          <span
+                            className={`my-act-status-badge status-${application.status}`}
+                          >
+                            {application.status}
+                          </span>
+                        </span>
+
+                        <span className="my-act-badge-group">
+                          <span className="my-act-badge-label">Opportunity</span>
+
+                          <span
+                            className={`my-act-opp-badge opp-${application.opportunity_status}`}
+                          >
+                            {application.opportunity_status}
+                          </span>
                         </span>
                       </div>
 

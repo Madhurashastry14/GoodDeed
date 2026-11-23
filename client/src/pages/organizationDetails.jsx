@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,7 +10,10 @@ import {
   Pencil,
   Plus,
   CalendarDays,
+  ChevronDown,
   Clock,
+  LayoutDashboard,
+  Settings2,
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
@@ -50,6 +53,9 @@ export default function OrganizationDetails() {
   const { accessToken, loading: authLoading } = useAuth();
 
   const [notice] = useState(location.state?.message || "");
+
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const actionsRef = useRef(null);
 
   const [isOwner, setIsOwner] = useState(false);
   const [canCreateOpportunity, setCanCreateOpportunity] = useState(false);
@@ -239,6 +245,31 @@ export default function OrganizationDetails() {
     };
   }, [id, accessToken, authLoading]);
 
+  // Close the manage menu on outside click or Escape
+  useEffect(() => {
+    if (!actionsOpen) return;
+
+    function handlePointerDown(event) {
+      if (actionsRef.current && !actionsRef.current.contains(event.target)) {
+        setActionsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setActionsOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [actionsOpen]);
+
   // Loading state
   if (loading) {
     return (
@@ -335,38 +366,81 @@ export default function OrganizationDetails() {
                   rel="noopener noreferrer"
                   className="org-website-btn"
                 >
-                  <Globe size={17} />
-                  Visit website
+                  <Globe size={16} />
+                  Website
                 </a>
               )}
 
-              {/* Owner-only actions */}
+              {/* Owner-only action */}
               {canCreateOpportunity && (
                 <Link
                   to={`/organizations/${id}/opportunities/new`}
                   className="org-create-opp-btn"
                 >
                   <Plus size={17} />
-                  Create Opportunity
+                  Create opportunity
                 </Link>
               )}
 
-              {/* Owner-only actions */}
-              {isOwner && (
-                <Link to={`/organizations/${id}/edit`} className="org-edit-btn">
-                  <Pencil size={16} />
-                  Edit organization
+              {isOwner ? (
+                <div className="org-actions-menu" ref={actionsRef}>
+                  <button
+                    type="button"
+                    className={`org-more-btn${actionsOpen ? " is-open" : ""}`}
+                    aria-haspopup="menu"
+                    aria-expanded={actionsOpen}
+                    aria-controls="org-manage-menu"
+                    onClick={() => setActionsOpen((open) => !open)}
+                  >
+                    <Settings2 size={16} />
+                    Manage
+                    <ChevronDown size={15} className="org-more-caret" />
+                  </button>
+
+                  {actionsOpen && (
+                    <div
+                      className="org-actions-panel"
+                      id="org-manage-menu"
+                      role="menu"
+                    >
+                      <Link
+                        to={`/organizations/${id}/dashboard`}
+                        role="menuitem"
+                        onClick={() => setActionsOpen(false)}
+                      >
+                        <LayoutDashboard size={16} />
+                        Owner dashboard
+                      </Link>
+
+                      <Link
+                        to={`/organizations/${id}/edit`}
+                        role="menuitem"
+                        onClick={() => setActionsOpen(false)}
+                      >
+                        <Pencil size={16} />
+                        Edit organization
+                      </Link>
+
+                      <Link
+                        to={`/organizations/${id}/members`}
+                        role="menuitem"
+                        onClick={() => setActionsOpen(false)}
+                      >
+                        <Users size={16} />
+                        Manage members
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to={`/organizations/${id}/members`}
+                  className="org-more-btn org-more-btn--link"
+                >
+                  <Users size={16} />
+                  View members
                 </Link>
               )}
-
-              {/* Members */}
-              <Link
-                to={`/organizations/${id}/members`}
-                className="org-edit-btn"
-              >
-                <Users size={16} />
-                {isOwner ? "Manage members" : "View members"}
-              </Link>
             </div>
           </section>
 

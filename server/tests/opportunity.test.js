@@ -873,6 +873,16 @@ test("applicants can only withdraw their own applications", async () => {
   );
 
   assert.equal(withdrawn.status, 200);
+
+  const duplicateWithdraw = await api(
+    `/opportunity-applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+      token: tokenFor(applicantTwo),
+    },
+  );
+
+  assert.equal(duplicateWithdraw.status, 409);
 });
 
 test("applications cannot be withdrawn after the opportunity starts", async () => {
@@ -921,6 +931,10 @@ test("my applications include withdraw eligibility", async () => {
 
   assert.ok(application);
   assert.equal(application.can_withdraw, true);
+  assert.ok(application.opportunity_title);
+  assert.ok(application.organization_name);
+  assert.ok(application.starts_at);
+  assert.equal(application.opportunity_status, "published");
 });
 
 test("admin cannot view opportunity applicants", async () => {

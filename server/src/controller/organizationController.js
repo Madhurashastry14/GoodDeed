@@ -1,5 +1,8 @@
 const organizationService = require("../services/organizationService");
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 async function createOrganization(req, res) {
   try {
     const { name, description, city, website } = req.body;
@@ -110,6 +113,33 @@ async function getMyOrganization(req, res) {
     console.error("Get organization failed:", error.message);
     return res.status(500).json({
       error: "Unable to fetch organizations",
+    });
+  }
+}
+
+async function getOrganizationDashboard(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return res.status(400).json({
+        error: "Valid organization ID is required",
+      });
+    }
+
+    const dashboard = await organizationService.getOrganizationDashboard(
+      id,
+      req.user.id,
+    );
+
+    return res.status(200).json(dashboard);
+  } catch (error) {
+    console.error("Get organization dashboard failed:", error.message);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to fetch organization dashboard",
     });
   }
 }
@@ -232,6 +262,7 @@ module.exports = {
   getOrganization,
   getOrganizationById,
   getMyOrganization,
+  getOrganizationDashboard,
   getOrganizationMembers,
   addOrganizationMember,
   removemember,
