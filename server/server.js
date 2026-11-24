@@ -6,6 +6,8 @@ const userRoutes = require("./src/routes/userRoutes");
 const organizationRoutes = require("./src/routes/organizationRoutes");
 const opportunityRoutes = require("./src/routes/opportunityRoutes");
 const applicationRoutes = require("./src/routes/applicationRoutes");
+const itemRoutes = require("./src/routes/itemRoutes");
+const itemClaimRoutes = require("./src/routes/itemClaimRoutes");
 const cookieparser = require("cookie-parser");
 const app = express();
 require("dotenv").config();
@@ -40,6 +42,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/opportunities", opportunityRoutes);
 app.use("/api/opportunity-applications", applicationRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/item-claims", itemClaimRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
