@@ -477,6 +477,20 @@ export default function ItemDetails() {
   const isOwner = Boolean(data?.viewer?.is_owner);
 
   useEffect(() => {
+    if (!data || !isOwner) return undefined;
+
+    if (window.location.hash !== "#received-claims") return undefined;
+
+    const timer = window.setTimeout(() => {
+      document
+        .getElementById("received-claims")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [data, isOwner]);
+
+  useEffect(() => {
     if (!isOwner || !accessToken) {
       return;
     }
