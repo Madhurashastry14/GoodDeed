@@ -116,10 +116,140 @@ async function withdrawClaim(req, res) {
   }
 }
 
+async function acceptClaim(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return invalidId(res, "claim");
+    }
+
+    const claim = await itemClaimService.acceptClaim(id, req.user.id);
+
+    return res.status(200).json({
+      message: "Claim accepted and item reserved",
+      claim,
+    });
+  } catch (error) {
+    console.error("Accept claim failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to accept claim",
+    });
+  }
+}
+
+async function cancelReservation(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return invalidId(res, "claim");
+    }
+
+    const claim = await itemClaimService.cancelReservation(id, req.user.id);
+
+    return res.status(200).json({
+      message: "Reservation cancelled and item made available",
+      claim,
+    });
+  } catch (error) {
+    console.error("Cancel reservation failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to cancel reservation",
+    });
+  }
+}
+
+async function updateHandover(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return invalidId(res, "claim");
+    }
+
+    const claim = await itemClaimService.updateHandover(
+      id,
+      req.user.id,
+      req.body ?? {},
+    );
+
+    return res.status(200).json({
+      message: "Handover details updated",
+      claim,
+    });
+  } catch (error) {
+    console.error("Update handover failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to update handover details",
+    });
+  }
+}
+
+async function getClaim(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return invalidId(res, "claim");
+    }
+
+    const claim = await itemClaimService.getClaimById(id, req.user.id);
+
+    return res.status(200).json({ claim });
+  } catch (error) {
+    console.error("Get claim failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode ? error.message : "Unable to fetch claim",
+    });
+  }
+}
+
+async function confirmHandover(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return invalidId(res, "claim");
+    }
+
+    const claim = await itemClaimService.confirmHandover(id, req.user.id);
+
+    return res.status(200).json({
+      message:
+        claim.status === "completed"
+          ? "Donation completed"
+          : "Handover confirmed. Waiting for the other party.",
+      claim,
+    });
+  } catch (error) {
+    console.error("Confirm handover failed:", error);
+
+    return res.status(error.statusCode || 500).json({
+      error: error.statusCode
+        ? error.message
+        : "Unable to confirm handover",
+    });
+  }
+}
+
 module.exports = {
   createClaim,
   getReceivedClaims,
   getMyClaims,
   rejectClaim,
   withdrawClaim,
+  acceptClaim,
+  cancelReservation,
+  updateHandover,
+  getClaim,
+  confirmHandover,
 };

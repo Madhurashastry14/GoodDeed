@@ -194,8 +194,16 @@ async function getMyItems(donorId) {
        accepted.recipient_confirmed_at,
        accepted.completed_at
      FROM items i
-     LEFT JOIN item_claims accepted
-       ON accepted.item_id = i.id AND accepted.status = 'accepted'
+     LEFT JOIN LATERAL (
+       SELECT c.*
+       FROM item_claims c
+       WHERE c.item_id = i.id AND c.status IN ('accepted', 'completed')
+       ORDER BY
+         CASE c.status WHEN 'accepted' THEN 0 ELSE 1 END,
+         c.completed_at DESC NULLS LAST,
+         c.updated_at DESC
+       LIMIT 1
+     ) accepted ON TRUE
      LEFT JOIN users recipient ON recipient.id = accepted.claimant_id
      WHERE i.donor_id = $1
      ORDER BY i.created_at DESC`,
