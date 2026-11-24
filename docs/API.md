@@ -185,35 +185,46 @@ Application statuses used by this module: `pending`, `accepted`, `rejected`, `wi
 
 ## 9. Free-Item Sharing
 
-**Status: Planned.**
+**Status: Implemented.**
 
-| Method | Endpoint              | Access        | Description                      |
-| ------ | --------------------- | ------------- | -------------------------------- |
-| GET    | `/items`              | Public        | Browse available items           |
-| GET    | `/items/:id`          | Public        | View item details                |
-| POST   | `/items`              | Authenticated | List an item for free            |
-| PATCH  | `/items/:id`          | Item owner    | Update an item listing           |
-| DELETE | `/items/:id`          | Item owner    | Remove an item listing           |
-| POST   | `/items/:id/requests` | Authenticated | Request an item                  |
-| GET    | `/items/mine`         | Authenticated | View the current user's listings |
+| Method | Endpoint             | Access        | Description                              |
+| ------ | -------------------- | ------------- | ---------------------------------------- |
+| GET    | `/items`             | Public        | Browse available and reserved items      |
+| GET    | `/items/mine`        | Authenticated | View the current user's listings         |
+| GET    | `/items/:id`         | Public        | View item details and permitted actions  |
+| POST   | `/items`             | Authenticated | List an item for free                    |
+| PATCH  | `/items/:id`         | Item owner    | Update an available item listing         |
+| PATCH  | `/items/:id/close`   | Item owner    | Close an available listing               |
+| DELETE | `/items/:id`         | Item owner    | Delete a listing with no claim history   |
 
-Item listings may include title, description, category, condition, quantity, city, and availability status.
+Item listings include a title, description, category, condition, city, image URL, and status. Categories are `furniture`, `electronics`, `clothing`, `books`, `household`, `sports`, `toys`, and `other`; conditions are `new`, `like_new`, `good`, and `fair`.
+
+Item statuses are `available`, `reserved`, `donated`, and `closed`. Public discovery returns only `available` and `reserved` listings, with available items first, and supports `search`, `city`, and `category` filters. Status changes are managed only through claims and handover actions; `PATCH` rejects a client-supplied status. Reserved and donated items are read-only, and listings with any claim history cannot be deleted.
 
 Items are offered for free; this feature does not process monetary payments.
 
-## 10. Item Requests and Handover
+## 10. Item Claims and Handover
 
-**Status: Planned.**
+**Status: Implemented.**
 
-| Method | Endpoint                      | Access                  | Description                      |
-| ------ | ----------------------------- | ----------------------- | -------------------------------- |
-| GET    | `/item-requests/mine`         | Authenticated           | View the current user's requests |
-| GET    | `/items/:id/requests`         | Item owner              | View requests for an item        |
-| PATCH  | `/item-requests/:id/status`   | Item owner              | Accept or reject a request       |
-| PATCH  | `/item-requests/:id/handover` | Authorized participants | Update handover status           |
-| PATCH  | `/item-requests/:id/receipt`  | Authorized participants | Confirm receipt                  |
+| Method | Endpoint                              | Access                  | Description                              |
+| ------ | ------------------------------------- | ----------------------- | ---------------------------------------- |
+| POST   | `/items/:id/claims`                   | Authenticated           | Request an available item                |
+| GET    | `/items/:id/claims`                   | Item owner              | View requests and claimant display data  |
+| GET    | `/item-claims/me`                     | Authenticated           | View the current user's claim history    |
+| GET    | `/item-claims/:id`                    | Donor or claimant       | View one claim                           |
+| PATCH  | `/item-claims/:id/accept`             | Item owner              | Select the recipient and reserve item    |
+| PATCH  | `/item-claims/:id/reject`             | Item owner              | Reject a pending claim                   |
+| PATCH  | `/item-claims/:id/withdraw`           | Claimant                | Withdraw a pending claim                 |
+| PATCH  | `/item-claims/:id/cancel`             | Donor or recipient      | Cancel an accepted reservation           |
+| PATCH  | `/item-claims/:id/handover`           | Donor or recipient      | Update handover time, place, and note    |
+| PATCH  | `/item-claims/:id/confirm-handover`   | Donor or recipient      | Confirm handover independently           |
 
-The backend should validate available quantities, prevent over-allocation, and maintain an auditable handover status.
+Claim statuses are `pending`, `accepted`, `rejected`, `withdrawn`, `cancelled`, and `completed`. A claimant cannot request their own listing, cannot hold more than one active claim per item, and cannot claim an item that is not `available`. Only the listing owner can accept or reject claims, and only one claim can be accepted per item.
+
+Accepting a claim sets it to `accepted` and the item to `reserved`. Accept, cancel, and confirmation operations use transactions with a consistent item-then-claim row lock order. Cancelling a reservation requires an accepted claim on a reserved item with no handover confirmation from either party, returns the item to `available`, and keeps the cancelled claim as history.
+
+Handover details (note, public meeting location, and time) are visible only to the donor and selected recipient. Both parties confirm independently; the first confirmation records that party's timestamp without completing the donation. When both confirmations exist, the claim becomes `completed`, the item becomes `donated`, remaining pending claims are rejected, and the completion timestamp is recorded. Repeated confirmations are idempotent. Completed donations cannot be reopened or deleted. Claimant display data exposes only public profile fields and never private contact details.
 
 ## 11. Help Requests
 
