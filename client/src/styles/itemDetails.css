@@ -1,0 +1,795 @@
+.item-detail-page {
+  min-height: 100vh;
+  background: #fafbf7;
+  color: #193d29;
+  font-family: "DM Sans", sans-serif;
+}
+
+.item-detail-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px 24px 90px;
+}
+
+.item-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 30px;
+  color: #477a55;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.item-detail-back:hover {
+  color: #176c3b;
+}
+
+.item-detail-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 70vh;
+  padding: 30px;
+  color: #758376;
+  text-align: center;
+}
+
+.item-detail-status h1 {
+  margin: 0;
+  color: #193d29;
+  font-size: 24px;
+}
+
+.item-detail-status a {
+  color: #176c3b;
+  font-weight: 800;
+}
+
+.item-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 30px;
+  padding: 30px;
+  border: 1px solid #dfebdd;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #e9f4e8, #f3f8ee);
+}
+
+.item-detail-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 290px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #eef4ec;
+}
+
+.item-detail-image img {
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+  object-fit: cover;
+}
+
+.item-detail-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #7f9885;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.item-detail-hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.item-detail-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.item-detail-eyebrow {
+  color: #287a46;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.item-detail-status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ec;
+  color: #5f7263;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.item-detail-status-badge.status-available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.item-detail-status-badge.status-reserved {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.item-detail-status-badge.status-donated {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.item-detail-status-badge.status-closed {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.item-detail-hero-content h1 {
+  margin: 14px 0 18px;
+  font-family: "Manrope", sans-serif;
+  font-size: clamp(28px, 3.6vw, 40px);
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.item-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: #5d7563;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.item-detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.item-detail-primary,
+.item-detail-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.item-detail-primary {
+  border: 1px solid #176c3b;
+  background: #176c3b;
+  color: #fff;
+}
+
+.item-detail-primary:hover {
+  background: #11552e;
+}
+
+.item-detail-secondary {
+  border: 1px solid #cfe0cd;
+  background: #fff;
+  color: #176c3b;
+}
+
+.item-detail-secondary:hover {
+  background: #f3f8f1;
+}
+
+.item-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.item-detail-card,
+.item-action-card,
+.item-reservation-card,
+.item-claims-panel {
+  padding: 26px;
+  border: 1px solid #e3ebe2;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.item-detail-card h2,
+.item-action-heading h2,
+.item-reservation-card h2,
+.item-claims-heading h2 {
+  margin: 0 0 16px;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  letter-spacing: -0.4px;
+}
+
+.item-detail-description {
+  margin: 0;
+  color: #617664;
+  font-size: 14px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.item-detail-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.item-detail-info div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-detail-info span {
+  color: #8a998b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.item-detail-info strong {
+  color: #193d29;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.item-action-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-action-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #176c3b;
+}
+
+.item-action-heading h2 {
+  margin: 4px 0 0;
+  color: #193d29;
+}
+
+.item-action-text {
+  margin: 0 0 15px;
+  color: #617664;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.item-action-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #f0e0b8;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #8a5a11;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.item-action-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 9px;
+  background: #176c3b;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.item-action-primary:hover {
+  background: #11552e;
+}
+
+.item-action-secondary {
+  align-self: flex-start;
+  padding: 11px 16px;
+  border: 1px solid #f0c9c5;
+  border-radius: 9px;
+  background: #fff;
+  color: #b42318;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.item-action-secondary:hover {
+  background: #fff1f0;
+}
+
+.item-action-secondary:disabled,
+.item-action-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.item-reservation-card {
+  grid-column: 1 / -1;
+}
+
+.item-reservation-heading {
+  margin-bottom: 10px;
+}
+
+.item-reservation-heading h2 {
+  margin: 4px 0 0;
+}
+
+.item-reservation-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f7faf5;
+}
+
+.item-reservation-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.item-reservation-summary span {
+  color: #8a998b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.item-reservation-summary strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.item-claims-panel {
+  grid-column: 1 / -1;
+  scroll-margin-top: 24px;
+}
+
+.item-claims-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.item-claims-heading h2 {
+  margin: 4px 0 0;
+}
+
+.item-claims-count {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef4ec;
+  color: #477a55;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.item-claims-error {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #ffd5d2;
+  border-radius: 9px;
+  background: #fff1f0;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.item-claims-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 25px;
+  border: 1px dashed #d7e4d6;
+  border-radius: 12px;
+  color: #758376;
+}
+
+.item-claims-empty svg {
+  flex-shrink: 0;
+  color: #176c3b;
+}
+
+.item-claims-empty p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.item-claims-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.item-claim {
+  padding: 18px;
+  border: 1px solid #e7eee5;
+  border-radius: 12px;
+  background: #fcfdfb;
+}
+
+.item-claim.claim-accepted {
+  border-color: #cfe8d4;
+  background: #f5fbf5;
+}
+
+.item-claim.claim-completed {
+  border-color: #cfe0f5;
+  background: #f6f9fe;
+}
+
+.item-claim-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.item-claim-top h3 {
+  margin: 0 0 4px;
+  font-family: "Manrope", sans-serif;
+  font-size: 15px;
+}
+
+.item-claim-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #7b8b7d;
+  font-size: 11px;
+}
+
+.item-claim-status {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eef2ec;
+  color: #5f7263;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.item-claim-status.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.item-claim-status.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.item-claim-status.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.item-claim-status.status-withdrawn,
+.item-claim-status.status-cancelled {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.item-claim-status.status-completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.item-claim-message {
+  margin: 12px 0;
+  color: #4f6555;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.item-claim-muted {
+  color: #8a998b;
+  font-style: italic;
+}
+
+.item-claim-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1ec;
+}
+
+.item-claim-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #7b8b7d;
+  font-size: 11px;
+}
+
+.item-claim-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-claim-accept,
+.item-claim-reject {
+  padding: 7px 12px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.item-claim-accept {
+  border: 1px solid #176c3b;
+  background: #176c3b;
+  color: #fff;
+}
+
+.item-claim-accept:hover:not(:disabled) {
+  background: #11552e;
+}
+
+.item-claim-reject {
+  border: 1px solid #f0c9c5;
+  background: #fff;
+  color: #b42318;
+}
+
+.item-claim-reject:hover:not(:disabled) {
+  background: #fff1f0;
+}
+
+.item-claim-accept:disabled,
+.item-claim-reject:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.item-claim-selected {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #176c3b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.item-claims-hold {
+  margin: 16px 0 0;
+  padding: 11px 13px;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #8a5a11;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Request modal */
+.item-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(14, 34, 22, 0.5);
+}
+
+.item-modal {
+  width: min(100%, 520px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(14, 34, 22, 0.25);
+}
+
+.item-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.item-modal-header h2 {
+  margin: 5px 0 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  letter-spacing: -0.4px;
+  overflow-wrap: anywhere;
+}
+
+.item-modal-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e3ebe2;
+  border-radius: 8px;
+  background: #fff;
+  color: #56715d;
+  cursor: pointer;
+}
+
+.item-modal-close:hover {
+  background: #f3f8f1;
+}
+
+.item-modal label {
+  display: block;
+  margin-bottom: 8px;
+  color: #38533e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.item-modal textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 1px solid #dce6da;
+  border-radius: 9px;
+  color: #193d29;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+.item-modal textarea:focus {
+  border-color: #27804b;
+}
+
+.item-modal small {
+  display: block;
+  margin-top: 6px;
+  color: #8a998b;
+  font-size: 11px;
+  text-align: right;
+}
+
+.item-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.item-modal-cancel,
+.item-modal-submit {
+  padding: 11px 17px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.item-modal-cancel {
+  border: 1px solid #dce6da;
+  background: #fff;
+  color: #56715d;
+}
+
+.item-modal-submit {
+  border: 1px solid #176c3b;
+  background: #176c3b;
+  color: #fff;
+}
+
+.item-modal-submit:hover:not(:disabled) {
+  background: #11552e;
+}
+
+.item-modal-cancel:disabled,
+.item-modal-submit:disabled,
+.item-modal-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 800px) {
+  .item-detail-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .item-detail-image {
+    min-height: 240px;
+  }
+
+  .item-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-reservation-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .item-detail-container {
+    padding: 25px 16px 70px;
+  }
+
+  .item-detail-hero,
+  .item-detail-card,
+  .item-action-card,
+  .item-reservation-card,
+  .item-claims-panel {
+    padding: 20px;
+  }
+
+  .item-detail-info {
+    grid-template-columns: 1fr;
+  }
+
+  .item-claim-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .item-modal {
+    padding: 20px;
+  }
+}
