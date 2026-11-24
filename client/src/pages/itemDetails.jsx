@@ -20,10 +20,13 @@ import { useAuth } from "../context/authContext";
 import { useConfirm, useToast } from "../context/notificationContext";
 import {
   acceptItemClaim,
+  cancelItemReservation,
+  confirmItemHandover,
   createItemClaim,
   getItemById,
   getReceivedClaims,
   rejectItemClaim,
+  updateItemHandover,
   withdrawItemClaim,
 } from "../services/api";
 import { categoryLabel, conditionLabel } from "../constants/items";
@@ -50,6 +53,369 @@ function formatDateTime(value) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  const pad = (part) => String(part).padStart(2, "0");
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate(),
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function ReservationPanel({ item, reservation, accessToken, onRefresh }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+
+  const noteRef = useRef(null);
+  const locationRef = useRef(null);
+  const timeRef = useRef(null);
+
+  const [saving, setSaving] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [error, setError] = useState("");
+
+  const isCompleted =
+    reservation.status === "completed" || item.status === "donated";
+  const myConfirmed =
+    reservation.my_role === "donor"
+      ? reservation.donor_confirmed
+      : reservation.recipient_confirmed;
+  const otherConfirmed =
+    reservation.my_role === "donor"
+      ? reservation.recipient_confirmed
+      : reservation.donor_confirmed;
+  const canCancel =
+    !isCompleted && !reservation.donor_confirmed && !reservation.recipient_confirmed;
+
+  async function handleSave(event) {
+    event.preventDefault();
+
+    if (!accessToken || saving) return;
+
+    setError("");
+    setSaving(true);
+
+    const handoverAtValue = timeRef.current?.value;
+
+    try {
+      let handoverAt = null;
+
+      if (handoverAtValue) {
+        const parsed = new Date(handoverAtValue);
+
+        if (Number.isNaN(parsed.getTime())) {
+          throw new Error("Enter a valid handover time.");
+        }
+
+        handoverAt = parsed.toISOString();
+      }
+
+      await updateItemHandover(
+        reservation.claim_id,
+        {
+          handoverNote: noteRef.current?.value.trim() || null,
+          handoverLocation: locationRef.current?.value.trim() || null,
+          handoverAt,
+        },
+        accessToken,
+      );
+
+      toast.success("Handover details saved.");
+      await onRefresh();
+    } catch (err) {
+      const message = err.message || "Unable to save handover details.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleConfirm() {
+    if (!accessToken || confirming) return;
+
+    const confirmed = await confirm({
+      title: "Confirm handover?",
+      message:
+        reservation.my_role === "donor"
+          ? `Confirm that you handed "${item.title}" to ${reservation.claimant_name}? Once both parties confirm, the donation is complete and cannot be undone.`
+          : `Confirm that you received "${item.title}" from ${item.donor_name}? Once both parties confirm, the donation is complete and cannot be undone.`,
+      confirmLabel: "Confirm handover",
+      cancelLabel: "Not yet",
+      tone: "primary",
+    });
+
+    if (!confirmed) return;
+
+    setError("");
+    setConfirming(true);
+
+    try {
+      const result = await confirmItemHandover(
+        reservation.claim_id,
+        accessToken,
+      );
+
+      toast.success(
+        result.claim?.status === "completed"
+          ? "Donation completed. Thank you for confirming."
+          : "Handover confirmed. Waiting for the other party.",
+      );
+      await onRefresh();
+    } catch (err) {
+      const message = err.message || "Unable to confirm handover.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setConfirming(false);
+    }
+  }
+
+  async function handleCancel() {
+    if (!accessToken || cancelling) return;
+
+    const confirmed = await confirm({
+      title: "Cancel this reservation?",
+      message: `Cancel the reservation for "${item.title}"? The item will become available again and other pending requests can be considered.`,
+      confirmLabel: "Cancel reservation",
+      cancelLabel: "Keep reservation",
+      tone: "danger",
+    });
+
+    if (!confirmed) return;
+
+    setError("");
+    setCancelling(true);
+
+    try {
+      await cancelItemReservation(reservation.claim_id, accessToken);
+      toast.success("Reservation cancelled. The item is available again.");
+      await onRefresh();
+    } catch (err) {
+      const message = err.message || "Unable to cancel the reservation.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  return (
+    <section className="item-reservation-card" id="handover">
+      <div className="item-reservation-heading">
+        <span className="item-detail-eyebrow">
+          {isCompleted ? "DONATION COMPLETE" : "RESERVATION"}
+        </span>
+        <h2>
+          {isCompleted ? "Completed handover" : "Handover coordination"}
+        </h2>
+      </div>
+
+      <p className="item-action-text">
+        {isCompleted
+          ? `"${item.title}" was handed over to ${reservation.claimant_name}. Both parties confirmed the donation.`
+          : "Only the donor and selected recipient can see these details. Meet in a public place and never share private addresses or contact information in this note."}
+      </p>
+
+      <div className="item-reservation-summary">
+        <div>
+          <span>Donor</span>
+          <strong>{item.donor_name}</strong>
+        </div>
+        <div>
+          <span>Recipient</span>
+          <strong>{reservation.claimant_name}</strong>
+        </div>
+        <div>
+          <span>Accepted</span>
+          <strong>{formatDateTime(reservation.accepted_at)}</strong>
+        </div>
+        <div>
+          <span>
+            {isCompleted ? "Completed" : "Your role"}
+          </span>
+          <strong>
+            {isCompleted
+              ? formatDateTime(reservation.completed_at)
+              : reservation.my_role === "donor"
+                ? "Donor"
+                : "Recipient"}
+          </strong>
+        </div>
+      </div>
+
+      {error && (
+        <p className="item-claims-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      {isCompleted ? (
+        <div className="item-handover-readonly">
+          <h3>Handover details</h3>
+
+          <div className="item-handover-details">
+            <div>
+              <span>Meeting place</span>
+              <strong>{reservation.handover_location || "Not recorded"}</strong>
+            </div>
+            <div>
+              <span>Proposed time</span>
+              <strong>{formatDateTime(reservation.handover_at)}</strong>
+            </div>
+            <div className="item-handover-note">
+              <span>Coordination note</span>
+              <strong>{reservation.handover_note || "Not recorded"}</strong>
+            </div>
+            <div>
+              <span>Donor confirmed</span>
+              <strong>{formatDateTime(reservation.donor_confirmed_at)}</strong>
+            </div>
+            <div>
+              <span>Recipient confirmed</span>
+              <strong>
+                {formatDateTime(reservation.recipient_confirmed_at)}
+              </strong>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <form
+            className="item-handover-form"
+            onSubmit={handleSave}
+            key={`${reservation.handover_note ?? ""}|${
+              reservation.handover_location ?? ""
+            }|${reservation.handover_at ?? ""}`}
+          >
+            <div className="item-handover-grid">
+              <div className="item-handover-field">
+                <label htmlFor="handover-location">
+                  Public meeting place
+                </label>
+                <input
+                  id="handover-location"
+                  ref={locationRef}
+                  type="text"
+                  maxLength={200}
+                  defaultValue={reservation.handover_location ?? ""}
+                  placeholder="e.g. City library entrance"
+                />
+              </div>
+
+              <div className="item-handover-field">
+                <label htmlFor="handover-time">Proposed handover time</label>
+                <input
+                  id="handover-time"
+                  ref={timeRef}
+                  type="datetime-local"
+                  defaultValue={toDateTimeLocal(reservation.handover_at)}
+                />
+              </div>
+            </div>
+
+            <div className="item-handover-field">
+              <label htmlFor="handover-note">Coordination note</label>
+              <textarea
+                id="handover-note"
+                ref={noteRef}
+                rows={3}
+                maxLength={1000}
+                defaultValue={reservation.handover_note ?? ""}
+                placeholder="Agree on a public meeting spot. Do not include phone numbers, emails, or home addresses."
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="item-handover-save"
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save handover details"}
+            </button>
+          </form>
+
+          <div className="item-confirmation-grid">
+            <div
+              className={`item-confirmation ${
+                reservation.donor_confirmed ? "confirmed" : ""
+              }`}
+            >
+              <span>Donor confirmation</span>
+              <strong>
+                {reservation.donor_confirmed
+                  ? `Confirmed ${formatDateTime(reservation.donor_confirmed_at)}`
+                  : "Waiting"}
+              </strong>
+            </div>
+
+            <div
+              className={`item-confirmation ${
+                reservation.recipient_confirmed ? "confirmed" : ""
+              }`}
+            >
+              <span>Recipient confirmation</span>
+              <strong>
+                {reservation.recipient_confirmed
+                  ? `Confirmed ${formatDateTime(
+                      reservation.recipient_confirmed_at,
+                    )}`
+                  : "Waiting"}
+              </strong>
+            </div>
+          </div>
+
+          {otherConfirmed && !myConfirmed && (
+            <p className="item-claims-hold">
+              The other party has confirmed the handover. Your confirmation will
+              complete the donation.
+            </p>
+          )}
+
+          {myConfirmed && !isCompleted && (
+            <p className="item-claims-hold">
+              You confirmed the handover. Waiting for the other party to
+              confirm. The reservation cannot be cancelled after a confirmation.
+            </p>
+          )}
+
+          <div className="item-reservation-actions">
+            <button
+              type="button"
+              className="item-action-primary"
+              onClick={handleConfirm}
+              disabled={confirming || myConfirmed || cancelling}
+            >
+              {confirming
+                ? "Confirming..."
+                : myConfirmed
+                  ? "You confirmed handover"
+                  : "Confirm handover"}
+            </button>
+
+            {canCancel && (
+              <button
+                type="button"
+                className="item-action-secondary"
+                onClick={handleCancel}
+                disabled={cancelling || confirming}
+              >
+                {cancelling ? "Cancelling..." : "Cancel reservation"}
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </section>
+  );
 }
 
 export default function ItemDetails() {
@@ -563,58 +929,16 @@ export default function ItemDetails() {
               )}
             </section>
 
-            {isParticipant && item.status === "reserved" && (
-              <section className="item-reservation-card">
-                <div className="item-reservation-heading">
-                  <span className="item-detail-eyebrow">RESERVATION</span>
-                  <h2>Handover coordination</h2>
-                </div>
-
-                <p className="item-action-text">
-                  The donor and selected recipient can see these details. Prefer
-                  a public meeting place and avoid sharing private addresses.
-                </p>
-
-                <div className="item-reservation-summary">
-                  <div>
-                    <span>Recipient</span>
-                    <strong>{reservation.claimant_name}</strong>
-                  </div>
-                  <div>
-                    <span>Accepted</span>
-                    <strong>{formatDateTime(reservation.accepted_at)}</strong>
-                  </div>
-                  <div>
-                    <span>Donor confirmed</span>
-                    <strong>
-                      {reservation.donor_confirmed ? "Yes" : "Not yet"}
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Recipient confirmed</span>
-                    <strong>
-                      {reservation.recipient_confirmed ? "Yes" : "Not yet"}
-                    </strong>
-                  </div>
-                </div>
-              </section>
-            )}
-
             {isParticipant &&
-              item.status === "donated" &&
-              reservation?.completed_at && (
-                <section className="item-reservation-card">
-                  <div className="item-reservation-heading">
-                    <span className="item-detail-eyebrow">DONATION COMPLETE</span>
-                    <h2>Thank you for completing this handover</h2>
-                  </div>
-
-                  <p className="item-action-text">
-                    {item.title} was handed over to{" "}
-                    {reservation.claimant_name} on{" "}
-                    {formatDateTime(reservation.completed_at)}.
-                  </p>
-                </section>
+              (item.status === "reserved" || item.status === "donated") &&
+              reservation && (
+                <ReservationPanel
+                  key={reservation.claim_id}
+                  item={item}
+                  reservation={reservation}
+                  accessToken={accessToken}
+                  onRefresh={refresh}
+                />
               )}
 
             {viewer.is_owner && (
