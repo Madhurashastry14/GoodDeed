@@ -603,3 +603,163 @@ export async function withdrawApplication(applicationId, accessToken) {
 
   return data;
 }
+
+/* ------------------------------------------------------------------ */
+/* Free item sharing and item claims                                  */
+/* ------------------------------------------------------------------ */
+
+const API_BASE = "http://localhost:3000/api";
+const ITEMS_URL = `${API_BASE}/items`;
+const ITEM_CLAIMS_URL = `${API_BASE}/item-claims`;
+
+async function itemRequest(url, { method = "GET", accessToken, body } = {}) {
+  const headers = {};
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  if (body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const response = await fetch(url, {
+    method,
+    headers,
+    credentials: "include",
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+
+  // DELETE returns 204 No Content on success.
+  const text = await response.text();
+  let data = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = null;
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.error || data?.message || "Request failed");
+  }
+
+  return data;
+}
+
+export function getItems(filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const query = params.toString();
+
+  return itemRequest(`${ITEMS_URL}${query ? `?${query}` : ""}`);
+}
+
+export function getMyItems(accessToken) {
+  return itemRequest(`${ITEMS_URL}/mine`, { accessToken });
+}
+
+export function getItemById(itemId, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}`, { accessToken });
+}
+
+export function createItem(itemData, accessToken) {
+  return itemRequest(ITEMS_URL, {
+    method: "POST",
+    accessToken,
+    body: itemData,
+  });
+}
+
+export function updateItem(itemId, itemData, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}`, {
+    method: "PATCH",
+    accessToken,
+    body: itemData,
+  });
+}
+
+export function closeItem(itemId, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}/close`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function removeItem(itemId, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}`, {
+    method: "DELETE",
+    accessToken,
+  });
+}
+
+export function createItemClaim(itemId, message, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}/claims`, {
+    method: "POST",
+    accessToken,
+    body: { message: message?.trim() || null },
+  });
+}
+
+export function getReceivedClaims(itemId, accessToken) {
+  return itemRequest(`${ITEMS_URL}/${itemId}/claims`, { accessToken });
+}
+
+export function getMyClaims(accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/me`, { accessToken });
+}
+
+export function getItemClaim(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}`, { accessToken });
+}
+
+export function acceptItemClaim(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/accept`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function rejectItemClaim(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/reject`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function withdrawItemClaim(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/withdraw`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function cancelItemReservation(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/cancel`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function updateItemHandover(claimId, details, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/handover`, {
+    method: "PATCH",
+    accessToken,
+    body: details,
+  });
+}
+
+export function confirmItemHandover(claimId, accessToken) {
+  return itemRequest(`${ITEM_CLAIMS_URL}/${claimId}/confirm-handover`, {
+    method: "PATCH",
+    accessToken,
+  });
+}

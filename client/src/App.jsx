@@ -20,6 +20,9 @@ import OpportunityDetails from "./pages/opportunityDetails";
 import EditOpportunity from "./pages/editOpportunity";
 import MyActivities from "./pages/myActivities";
 import OwnerDashboard from "./pages/ownerDashboard";
+import Items from "./pages/items";
+import ItemDetails from "./pages/itemDetails";
+import ItemForm from "./pages/itemForm";
 
 export default function App() {
   return (
@@ -108,10 +111,24 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/items" element={<Items />} />
         <Route
-          path="/items"
-          element={<ComingSoon title="Free Item Sharing" />}
+          path="/items/new"
+          element={
+            <ProtectedRoute>
+              <ItemForm />
+            </ProtectedRoute>
+          }
         />
+        <Route
+          path="/items/:id/edit"
+          element={
+            <ProtectedRoute>
+              <ItemForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/items/:id" element={<ItemDetails />} />
         <Route
           path="/help-requests"
           element={<ComingSoon title="Help Requests" />}
