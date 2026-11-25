@@ -226,21 +226,77 @@ Accepting a claim sets it to `accepted` and the item to `reserved`. Accept, canc
 
 Handover details (note, public meeting location, and time) are visible only to the donor and selected recipient. Both parties confirm independently; the first confirmation records that party's timestamp without completing the donation. When both confirmations exist, the claim becomes `completed`, the item becomes `donated`, remaining pending claims are rejected, and the completion timestamp is recorded. Repeated confirmations are idempotent. Completed donations cannot be reopened or deleted. Claimant display data exposes only public profile fields and never private contact details.
 
-## 11. Help Requests
+## 11. Verified Item Requests and Fulfillment
 
-**Status: Planned.**
+**Status: Implemented.**
 
-| Method | Endpoint                       | Access                           | Description                     |
-| ------ | ------------------------------ | -------------------------------- | ------------------------------- |
-| GET    | `/help-requests`               | Public, subject to privacy rules | Discover approved help requests |
-| GET    | `/help-requests/:id`           | Public or authorized users       | View request details            |
-| POST   | `/help-requests`               | Authenticated                    | Create a help request           |
-| PATCH  | `/help-requests/:id`           | Request owner or moderator       | Update a request                |
-| DELETE | `/help-requests/:id`           | Request owner or moderator       | Remove a request                |
-| POST   | `/help-requests/:id/responses` | Authenticated                    | Offer help                      |
-| PATCH  | `/help-responses/:id/status`   | Request owner                    | Accept or decline an offer      |
+Verified item requests let a person ask for an essential item and receive it from a verified donor. Requests are reviewed by a platform reviewer before they appear publicly, and fulfillment is coordinated privately between the requester and the selected donor.
 
-Sensitive requests must be moderated where appropriate. Public responses must not reveal private contact details or sensitive personal information.
+### 11.1 Requests
+
+| Method | Endpoint                       | Access                        | Description                                         |
+| ------ | ------------------------------ | ----------------------------- | --------------------------------------------------- |
+| GET    | `/item-requests`               | Public                        | Discover approved, verified requests                |
+| GET    | `/item-requests/me`            | Authenticated                 | View the current user's requests and offer counts   |
+| POST   | `/item-requests`               | Authenticated                 | Create a request draft                              |
+| GET    | `/item-requests/:id`           | Public or authorized users    | View request details within visibility rules        |
+| PATCH  | `/item-requests/:id`           | Requester                     | Update an editable request                          |
+| PATCH  | `/item-requests/:id/submit`    | Requester                     | Submit a draft for verification                     |
+| PATCH  | `/item-requests/:id/reopen`    | Requester                     | Reopen a changes-requested request as a draft       |
+| PATCH  | `/item-requests/:id/cancel`    | Requester                     | Cancel a request that is not reserved               |
+
+Request statuses are `draft`, `pending_verification`, `changes_requested`, `rejected`, `open`, `reserved`, `fulfilled`, and `cancelled`. Categories are `food`, `clothing`, `household`, `hygiene`, `school_supplies`, `baby_care`, and `other`; urgency is `low`, `normal`, or `high`. Quantities are whole numbers from 1 to 1000. Fulfillment always covers the full requested quantity; there is no partial fulfillment.
+
+Public discovery returns only requests whose status is `open` and whose `verified_at` timestamp is set. It supports `search`, `city`, `category`, `urgency`, `sort` (`newest` or `oldest`), `page`, and `limit` (maximum 50). The reason for requesting and all review notes are never included in public discovery. Draft, pending, changes-requested, rejected, cancelled, reserved, and fulfilled requests are not public.
+
+Editing an `open` request is a material change: it clears `verified_at`, moves the request to `pending_verification`, and removes it from discovery until a reviewer approves it again. Draft and changes-requested edits remain drafts. Requests pending verification, reserved, fulfilled, rejected, or cancelled cannot be edited. Cancelling a request rejects its pending offers.
+
+### 11.2 Fulfillment Offers
+
+| Method | Endpoint                                  | Access                     | Description                                  |
+| ------ | ----------------------------------------- | -------------------------- | -------------------------------------------- |
+| GET    | `/item-requests/:id/offers`               | Requester                  | View offers received for a request           |
+| POST   | `/item-requests/:id/offers`               | Authenticated non-requester| Offer to fulfill the full request            |
+| GET    | `/item-request-offers/me`                 | Authenticated              | View the current user's offers and history   |
+| PATCH  | `/item-request-offers/:id/accept`         | Requester                  | Select a donor and reserve the request       |
+| PATCH  | `/item-request-offers/:id/reject`         | Requester                  | Reject a pending offer                       |
+| PATCH  | `/item-request-offers/:id/withdraw`       | Offer donor                | Withdraw a pending offer                     |
+| PATCH  | `/item-request-offers/:id/cancel`         | Requester or selected donor| Cancel an accepted reservation               |
+| PATCH  | `/item-request-offers/:id/handover`       | Requester or selected donor| Update handover location, time, and note     |
+| PATCH  | `/item-request-offers/:id/confirm-handover` | Requester or selected donor | Confirm handover independently             |
+
+Offer statuses are `pending`, `accepted`, `rejected`, `withdrawn`, `cancelled`, and `completed`. An offer message is required and must be between 10 and 1000 characters. A user cannot offer on their own request, cannot hold more than one active offer per request, and can only offer while the request is verified and `open`. Only the requester sees received offers.
+
+A user acting for an organization must be that organization's `owner`; organization membership alone is insufficient. Both the donating user and the organization are recorded on the offer.
+
+Accepting one offer sets it to `accepted` and the request to `reserved`; other offers stay `pending` but can no longer be accepted, and new offers are blocked. A request can never have more than one accepted offer. Offer mutations use transactions with a consistent request-then-offer row lock order.
+
+Handover details are visible only to the requester and the selected donor and are hidden from everyone else. Both parties confirm independently. The first confirmation records that party's timestamp without completing the request. When both confirmations exist, the offer becomes `completed`, the request becomes `fulfilled` with a fulfillment timestamp, and remaining pending offers are rejected. Repeated confirmations are idempotent. Once either party confirms, the reservation can no longer be cancelled. Completed and cancelled offers remain as history; there are no hard deletes.
+
+### 11.3 Review Authorization
+
+Request review is a separate, platform-level responsibility. It is never granted by organization ownership or administration.
+
+| Method | Endpoint                                    | Access           | Description                              |
+| ------ | ------------------------------------------- | ---------------- | ---------------------------------------- |
+| GET    | `/admin/item-requests/access`               | Authenticated    | Check whether the user is a reviewer     |
+| GET    | `/admin/item-requests/pending`              | Platform reviewer| View the verification queue              |
+| GET    | `/admin/item-requests/:id`                  | Platform reviewer| View a request with review permissions   |
+| PATCH  | `/admin/item-requests/:id/approve`          | Platform reviewer| Approve and publish the request          |
+| PATCH  | `/admin/item-requests/:id/reject`           | Platform reviewer| Reject with required review notes        |
+| PATCH  | `/admin/item-requests/:id/request-changes`  | Platform reviewer| Request changes with required notes      |
+
+Reviewer rights are stored in `platform_reviewers` and checked from the database on every protected request, so revocation takes effect immediately. Self-review is forbidden: a reviewer can never decide on their own request. Rejections and change requests require review notes of at least 10 characters; those notes are shown to the requester as feedback but are never public. Approving sets `open` and records `verified_at`. Rejecting sets `rejected`; requesting changes sets `changes_requested`, which the requester can reopen as a draft. Every decision is appended to `item_request_reviews` and never overwritten.
+
+Reviewers are provisioned out of band with database credentials, never through the HTTP API:
+
+```bash
+node scripts/grant-reviewer.js <email-or-uuid> [--granted-by <email-or-uuid>]
+node scripts/grant-reviewer.js <email-or-uuid> --revoke
+node scripts/grant-reviewer.js --list
+```
+
+This feature does not process payments, handle sensitive documents, or provide real-time chat. Handover coordination is a private record, not a messaging channel.
 
 ## 12. Community Projects
 
