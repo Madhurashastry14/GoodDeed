@@ -9,6 +9,7 @@ import {
   Gift,
   HandHeart,
   MapPin,
+  PackageCheck,
   UserRound,
 } from "lucide-react";
 
@@ -16,13 +17,25 @@ import Navbar from "../components/navbar";
 import { useAuth } from "../context/authContext";
 import { useConfirm, useToast } from "../context/notificationContext";
 import {
+  offerStatusLabel,
+  requestStatusLabel,
+  urgencyLabel,
+} from "../constants/itemRequests";
+import {
   cancelItemReservation,
+  cancelItemRequestOffer,
   confirmItemHandover,
+  confirmItemRequestHandover,
   getMyApplications,
   getMyClaims,
+  getMyItemRequestOffers,
+  getMyItemRequests,
   getMyItems,
+  reopenItemRequest,
+  submitItemRequest,
   withdrawApplication,
   withdrawItemClaim,
+  withdrawItemRequestOffer,
 } from "../services/api";
 import "../styles/myActivities.css";
 
@@ -53,6 +66,8 @@ const TABS = [
   { id: "applications", label: "Volunteer applications" },
   { id: "donations", label: "My donations" },
   { id: "claims", label: "My claims" },
+  { id: "item-requests", label: "My item requests" },
+  { id: "fulfillment-offers", label: "My fulfillment offers" },
 ];
 
 const DONATION_FILTERS = [
@@ -87,6 +102,18 @@ export default function MyActivities() {
   const [claimsError, setClaimsError] = useState("");
   const [claimBusyId, setClaimBusyId] = useState("");
   const claimActionInFlight = useRef(false);
+
+  const [itemRequests, setItemRequests] = useState([]);
+  const [itemRequestsLoading, setItemRequestsLoading] = useState(true);
+  const [itemRequestsError, setItemRequestsError] = useState("");
+  const [requestBusyId, setRequestBusyId] = useState("");
+  const requestActionInFlight = useRef(false);
+
+  const [offers, setOffers] = useState([]);
+  const [offersLoading, setOffersLoading] = useState(true);
+  const [offersError, setOffersError] = useState("");
+  const [offerBusyId, setOfferBusyId] = useState("");
+  const offerActionInFlight = useRef(false);
 
   useEffect(() => {
     if (authLoading || !accessToken) return;
@@ -179,6 +206,78 @@ export default function MyActivities() {
       active = false;
     };
   }, [accessToken, authLoading]);
+
+  useEffect(() => {
+    if (authLoading || !accessToken) return;
+
+    let active = true;
+
+    async function loadItemRequests() {
+      try {
+        const data = await getMyItemRequests(accessToken);
+
+        if (active) {
+          setItemRequests(
+            Array.isArray(data.requests) ? data.requests : [],
+          );
+        }
+      } catch (err) {
+        if (active) {
+          setItemRequestsError(err.message || "Failed to load your item requests");
+        }
+      } finally {
+        if (active) {
+          setItemRequestsLoading(false);
+        }
+      }
+    }
+
+    loadItemRequests();
+
+    return () => {
+      active = false;
+    };
+  }, [accessToken, authLoading]);
+
+  useEffect(() => {
+    if (authLoading || !accessToken) return;
+
+    let active = true;
+
+    async function loadOffers() {
+      try {
+        const data = await getMyItemRequestOffers(accessToken);
+
+        if (active) {
+          setOffers(Array.isArray(data.offers) ? data.offers : []);
+        }
+      } catch (err) {
+        if (active) {
+          setOffersError(err.message || "Failed to load your fulfillment offers");
+        }
+      } finally {
+        if (active) {
+          setOffersLoading(false);
+        }
+      }
+    }
+
+    loadOffers();
+
+    return () => {
+      active = false;
+    };
+  }, [accessToken, authLoading]);
+
+  async function refreshItemRequests() {
+    const data = await getMyItemRequests(accessToken);
+    setItemRequests(Array.isArray(data.requests) ? data.requests : []);
+  }
+
+  async function refreshOffers() {
+    const data = await getMyItemRequestOffers(accessToken);
+    setOffers(Array.isArray(data.offers) ? data.offers : []);
+  }
 
   async function refreshClaims() {
     const data = await getMyClaims(accessToken);
@@ -340,6 +439,166 @@ export default function MyActivities() {
     } finally {
       claimActionInFlight.current = false;
       setClaimBusyId("");
+    }
+  }
+
+  async function handleSubmitRequest(itemRequest) {
+    if (!accessToken || requestActionInFlight.current) return;
+
+    requestActionInFlight.current = true;
+
+    try {
+      const confirmed = await confirm({
+        title: "Submit this request for review?",
+        message: `Submit "${itemRequest.title}" to a platform reviewer? You will not be able to edit it while the review is in progress.`,
+        confirmLabel: "Submit for review",
+      });
+
+      if (!confirmed) return;
+
+      setRequestBusyId(itemRequest.id);
+      setItemRequestsError("");
+
+      await submitItemRequest(itemRequest.id, accessToken);
+      toast.success("Request submitted for verification.");
+      await refreshItemRequests();
+    } catch (err) {
+      const text = err.message || "Unable to submit the request";
+      setItemRequestsError(text);
+      toast.error(text);
+    } finally {
+      requestActionInFlight.current = false;
+      setRequestBusyId("");
+    }
+  }
+
+  async function handleReopenRequest(itemRequest) {
+    if (!accessToken || requestActionInFlight.current) return;
+
+    requestActionInFlight.current = true;
+
+    try {
+      const confirmed = await confirm({
+        title: "Reopen this request?",
+        message: `Reopen "${itemRequest.title}" as a draft so you can update it, then submit it for review again?`,
+        confirmLabel: "Reopen as draft",
+      });
+
+      if (!confirmed) return;
+
+      setRequestBusyId(itemRequest.id);
+      setItemRequestsError("");
+
+      await reopenItemRequest(itemRequest.id, accessToken);
+      toast.success("Request reopened as a draft.");
+      await refreshItemRequests();
+    } catch (err) {
+      const text = err.message || "Unable to reopen the request";
+      setItemRequestsError(text);
+      toast.error(text);
+    } finally {
+      requestActionInFlight.current = false;
+      setRequestBusyId("");
+    }
+  }
+
+  async function handleWithdrawOffer(offer) {
+    if (!accessToken || offerActionInFlight.current) return;
+
+    offerActionInFlight.current = true;
+
+    try {
+      const confirmed = await confirm({
+        title: "Withdraw your offer?",
+        message: `Withdraw your offer to fulfill "${offer.request_title}"? The requester will no longer see it.`,
+        confirmLabel: "Withdraw offer",
+        cancelLabel: "Keep offer",
+        tone: "danger",
+      });
+
+      if (!confirmed) return;
+
+      setOfferBusyId(offer.id);
+      setOffersError("");
+
+      await withdrawItemRequestOffer(offer.id, accessToken);
+      toast.success("Offer withdrawn.");
+      await refreshOffers();
+    } catch (err) {
+      const text = err.message || "Unable to withdraw the offer";
+      setOffersError(text);
+      toast.error(text);
+    } finally {
+      offerActionInFlight.current = false;
+      setOfferBusyId("");
+    }
+  }
+
+  async function handleCancelOffer(offer) {
+    if (!accessToken || offerActionInFlight.current) return;
+
+    offerActionInFlight.current = true;
+
+    try {
+      const confirmed = await confirm({
+        title: "Cancel this reservation?",
+        message: `Cancel the accepted offer for "${offer.request_title}"? The request becomes open again so another donor can help. This cannot be undone.`,
+        confirmLabel: "Cancel reservation",
+        cancelLabel: "Keep reservation",
+        tone: "danger",
+      });
+
+      if (!confirmed) return;
+
+      setOfferBusyId(offer.id);
+      setOffersError("");
+
+      await cancelItemRequestOffer(offer.id, accessToken);
+      toast.success("Reservation cancelled. The request is open again.");
+      await refreshOffers();
+    } catch (err) {
+      const text = err.message || "Unable to cancel the reservation";
+      setOffersError(text);
+      toast.error(text);
+    } finally {
+      offerActionInFlight.current = false;
+      setOfferBusyId("");
+    }
+  }
+
+  async function handleConfirmOfferHandover(offer) {
+    if (!accessToken || offerActionInFlight.current) return;
+
+    offerActionInFlight.current = true;
+
+    try {
+      const confirmed = await confirm({
+        title: "Confirm handover?",
+        message: `Confirm that you handed "${offer.request_title}" to the requester? Once both parties confirm, the request is fulfilled and cannot be undone.`,
+        confirmLabel: "Confirm handover",
+        cancelLabel: "Not yet",
+      });
+
+      if (!confirmed) return;
+
+      setOfferBusyId(offer.id);
+      setOffersError("");
+
+      const data = await confirmItemRequestHandover(offer.id, accessToken);
+
+      toast.success(
+        data.offer?.status === "completed"
+          ? "Fulfillment completed. Thank you for confirming."
+          : "Handover confirmed. Waiting for the requester.",
+      );
+      await refreshOffers();
+    } catch (err) {
+      const text = err.message || "Unable to confirm handover";
+      setOffersError(text);
+      toast.error(text);
+    } finally {
+      offerActionInFlight.current = false;
+      setOfferBusyId("");
     }
   }
 
@@ -863,6 +1122,356 @@ export default function MyActivities() {
                       </div>
                     </article>
                   ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {activeTab === "item-requests" && (
+            <section
+              className="my-act-section"
+              role="tabpanel"
+              id="my-act-panel-item-requests"
+              aria-labelledby="my-act-tab-item-requests"
+            >
+              <div className="my-act-heading">
+                <div>
+                  <span className="my-act-eyebrow">VERIFIED REQUESTS</span>
+                  <h2>My item requests</h2>
+                </div>
+
+                <ClipboardList size={24} />
+              </div>
+
+              {itemRequestsError && (
+                <p className="my-act-error" role="alert">
+                  {itemRequestsError}
+                </p>
+              )}
+
+              {itemRequestsLoading && (
+                <p className="my-act-status">Loading your item requests...</p>
+              )}
+
+              {!itemRequestsLoading &&
+                !itemRequestsError &&
+                itemRequests.length === 0 && (
+                  <div className="my-act-empty">
+                    <ClipboardList size={35} />
+                    <h3>No item requests yet</h3>
+                    <p>
+                      Ask for an essential item, track its verification, and
+                      coordinate fulfillment with a verified donor.
+                    </p>
+
+                    <Link to="/help-requests/new">
+                      Create a request
+                      <ArrowRight size={15} />
+                    </Link>
+                  </div>
+                )}
+
+              {!itemRequestsLoading && itemRequests.length > 0 && (
+                <div className="my-act-list">
+                  {itemRequests.map((itemRequest) => {
+                    const canEdit = ["draft", "changes_requested"].includes(
+                      itemRequest.status,
+                    );
+                    const busy = requestBusyId === itemRequest.id;
+
+                    return (
+                      <article className="my-act-card" key={itemRequest.id}>
+                        <div className="my-act-card-main">
+                          <div className="my-act-card-top">
+                            <span className="my-act-badge-group">
+                              <span className="my-act-badge-label">Request</span>
+                              <span
+                                className={`my-act-status-badge status-${itemRequest.status}`}
+                              >
+                                {requestStatusLabel(itemRequest.status)}
+                              </span>
+                            </span>
+
+                            <span className="my-act-badge-group">
+                              <span className="my-act-badge-label">Offers</span>
+                              <span className="my-act-count-badge">
+                                {itemRequest.pending_offer_count} pending /{" "}
+                                {itemRequest.offer_count} total
+                              </span>
+                            </span>
+                          </div>
+
+                          <h3>{itemRequest.title}</h3>
+
+                          <div className="my-act-meta">
+                            <span>
+                              <MapPin size={14} />
+                              {itemRequest.city}
+                            </span>
+                            <span>
+                              <CalendarDays size={14} />
+                              Created: {formatDate(itemRequest.created_at)}
+                            </span>
+                            <span>
+                              Quantity: {itemRequest.quantity}
+                            </span>
+                            <span>
+                              Urgency: {urgencyLabel(itemRequest.urgency)}
+                            </span>
+                          </div>
+
+                          {itemRequest.selected_donor_name && (
+                            <p className="my-act-recipient">
+                              <UserRound size={13} />
+                              Selected donor:{" "}
+                              <strong>
+                                {itemRequest.selected_organization_name
+                                  ? `${itemRequest.selected_organization_name} (${itemRequest.selected_donor_name})`
+                                  : itemRequest.selected_donor_name}
+                              </strong>
+                            </p>
+                          )}
+
+                          {itemRequest.status === "reserved" &&
+                            itemRequest.handover_state && (
+                              <p className="my-act-handover-note">
+                                {itemRequest.handover_state === "completed"
+                                  ? "Both parties confirmed the handover."
+                                  : itemRequest.handover_state ===
+                                      "donor_confirmed"
+                                    ? "The donor confirmed the handover. Your confirmation will complete the request."
+                                    : itemRequest.handover_state ===
+                                        "requester_confirmed"
+                                      ? "You confirmed the handover. Waiting for the donor."
+                                      : "Coordinate a public handover with the donor, then both of you confirm."}
+                              </p>
+                            )}
+
+                          {itemRequest.latest_review_notes &&
+                            ["changes_requested", "rejected"].includes(
+                              itemRequest.status,
+                            ) && (
+                              <p className="my-act-handover-note">
+                                Reviewer feedback:{" "}
+                                {itemRequest.latest_review_notes}
+                              </p>
+                            )}
+
+                          {itemRequest.status === "fulfilled" &&
+                            itemRequest.fulfilled_at && (
+                              <p className="my-act-completed">
+                                <CheckCircle2 size={14} />
+                                Fulfilled on {formatDate(itemRequest.fulfilled_at)}
+                              </p>
+                            )}
+                        </div>
+
+                        <div className="my-act-card-actions">
+                          <Link
+                            to={`/help-requests/${itemRequest.id}`}
+                            className="my-act-view"
+                          >
+                            View request
+                            <ArrowRight size={15} />
+                          </Link>
+
+                          {canEdit && (
+                            <Link
+                              to={`/help-requests/${itemRequest.id}/edit`}
+                              className="my-act-manage"
+                            >
+                              Edit request
+                            </Link>
+                          )}
+
+                          {itemRequest.status === "draft" && (
+                            <button
+                              type="button"
+                              className="my-act-confirm"
+                              disabled={busy}
+                              onClick={() => handleSubmitRequest(itemRequest)}
+                            >
+                              {busy ? "Submitting..." : "Submit for review"}
+                            </button>
+                          )}
+
+                          {itemRequest.status === "changes_requested" && (
+                            <button
+                              type="button"
+                              className="my-act-confirm"
+                              disabled={busy}
+                              onClick={() => handleReopenRequest(itemRequest)}
+                            >
+                              {busy ? "Reopening..." : "Reopen as draft"}
+                            </button>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+
+          {activeTab === "fulfillment-offers" && (
+            <section
+              className="my-act-section"
+              role="tabpanel"
+              id="my-act-panel-fulfillment-offers"
+              aria-labelledby="my-act-tab-fulfillment-offers"
+            >
+              <div className="my-act-heading">
+                <div>
+                  <span className="my-act-eyebrow">DONOR COMMITMENTS</span>
+                  <h2>My fulfillment offers</h2>
+                </div>
+
+                <PackageCheck size={24} />
+              </div>
+
+              {offersError && (
+                <p className="my-act-error" role="alert">
+                  {offersError}
+                </p>
+              )}
+
+              {offersLoading && (
+                <p className="my-act-status">Loading your offers...</p>
+              )}
+
+              {!offersLoading && !offersError && offers.length === 0 && (
+                <div className="my-act-empty">
+                  <PackageCheck size={35} />
+                  <h3>No fulfillment offers yet</h3>
+                  <p>
+                    Offer to provide an item that someone has requested. Your
+                    offer stays private to the requester until they select you.
+                  </p>
+
+                  <Link to="/help-requests">
+                    Browse verified requests
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+              )}
+
+              {!offersLoading && offers.length > 0 && (
+                <div className="my-act-list">
+                  {offers.map((offer) => {
+                    const busy = offerBusyId === offer.id;
+
+                    return (
+                      <article className="my-act-card" key={offer.id}>
+                        <div className="my-act-card-main">
+                          <div className="my-act-card-top">
+                            <span className="my-act-badge-group">
+                              <span className="my-act-badge-label">Offer</span>
+                              <span
+                                className={`my-act-status-badge status-${offer.status}`}
+                              >
+                                {offerStatusLabel(offer.status)}
+                              </span>
+                            </span>
+
+                            <span className="my-act-badge-group">
+                              <span className="my-act-badge-label">Request</span>
+                              <span
+                                className={`my-act-item-badge item-${offer.request_status}`}
+                              >
+                                {requestStatusLabel(offer.request_status)}
+                              </span>
+                            </span>
+                          </div>
+
+                          <h3>{offer.request_title}</h3>
+
+                          <span className="my-act-org">
+                            <UserRound size={14} />
+                            Requester: {offer.requester_name}
+                          </span>
+
+                          <div className="my-act-meta">
+                            <span>
+                              <MapPin size={14} />
+                              {offer.request_city || "Location not specified"}
+                            </span>
+                            <span>
+                              <CalendarDays size={14} />
+                              Offered: {formatDateTime(offer.created_at)}
+                            </span>
+                            {offer.completed_at && (
+                              <span>
+                                <CheckCircle2 size={14} />
+                                Completed: {formatDate(offer.completed_at)}
+                              </span>
+                            )}
+                          </div>
+
+                          {offer.status === "pending" && (
+                            <p className="my-act-handover-note">
+                              Waiting for the requester to review offers. You can
+                              withdraw your offer until it is accepted.
+                            </p>
+                          )}
+
+                          {offer.status === "accepted" && (
+                            <p className="my-act-handover-note">
+                              {offer.my_confirmed_at && !offer.other_confirmed_at
+                                ? "You confirmed the handover. Waiting for the requester."
+                                : !offer.my_confirmed_at &&
+                                    offer.other_confirmed_at
+                                  ? "The requester confirmed the handover. Your confirmation will complete the request."
+                                  : "You were selected. Coordinate a public handover with the requester, then both of you confirm."}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="my-act-card-actions">
+                          <Link
+                            to={`/help-requests/${offer.request_id}`}
+                            className="my-act-view"
+                          >
+                            View request
+                            <ArrowRight size={15} />
+                          </Link>
+
+                          {offer.can_withdraw && (
+                            <button
+                              type="button"
+                              className="my-act-withdraw"
+                              disabled={busy}
+                              onClick={() => handleWithdrawOffer(offer)}
+                            >
+                              {busy ? "Withdrawing..." : "Withdraw offer"}
+                            </button>
+                          )}
+
+                          {offer.can_cancel && (
+                            <button
+                              type="button"
+                              className="my-act-withdraw"
+                              disabled={busy}
+                              onClick={() => handleCancelOffer(offer)}
+                            >
+                              {busy ? "Cancelling..." : "Cancel reservation"}
+                            </button>
+                          )}
+
+                          {offer.can_confirm && (
+                            <button
+                              type="button"
+                              className="my-act-confirm"
+                              disabled={busy}
+                              onClick={() => handleConfirmOfferHandover(offer)}
+                            >
+                              {busy ? "Confirming..." : "Confirm handover"}
+                            </button>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </section>

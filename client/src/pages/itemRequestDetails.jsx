@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import Navbar from "../components/navbar";
+import ItemRequestFulfillment from "../components/itemRequestFulfillment";
 import { useAuth } from "../context/authContext";
 import { useConfirm, useToast } from "../context/notificationContext";
 import {
@@ -412,6 +413,12 @@ export default function ItemRequestDetails() {
                   )}
                 </section>
               )}
+
+              <ItemRequestFulfillment
+                detail={detail}
+                accessToken={accessToken}
+                onRefresh={refreshDetail}
+              />
 
               <section className="ir-panel">
                 <h2>
