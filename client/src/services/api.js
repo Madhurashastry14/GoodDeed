@@ -763,3 +763,188 @@ export function confirmItemHandover(claimId, accessToken) {
     accessToken,
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* Verified item requests and fulfillment offers                       */
+/* ------------------------------------------------------------------ */
+
+const ITEM_REQUESTS_URL = `${API_BASE}/item-requests`;
+const ITEM_REQUEST_OFFERS_URL = `${API_BASE}/item-request-offers`;
+const ADMIN_ITEM_REQUESTS_URL = `${API_BASE}/admin/item-requests`;
+
+function withQuery(url, filters = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const query = params.toString();
+
+  return `${url}${query ? `?${query}` : ""}`;
+}
+
+export function getItemRequests(filters = {}) {
+  return itemRequest(withQuery(ITEM_REQUESTS_URL, filters));
+}
+
+export function getMyItemRequests(accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/me`, { accessToken });
+}
+
+export function getItemRequestById(requestId, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}`, { accessToken });
+}
+
+export function createItemRequest(requestData, accessToken) {
+  return itemRequest(ITEM_REQUESTS_URL, {
+    method: "POST",
+    accessToken,
+    body: requestData,
+  });
+}
+
+export function updateItemRequest(requestId, requestData, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}`, {
+    method: "PATCH",
+    accessToken,
+    body: requestData,
+  });
+}
+
+export function submitItemRequest(requestId, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}/submit`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function reopenItemRequest(requestId, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}/reopen`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function cancelItemRequest(requestId, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}/cancel`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function getReviewerAccess(accessToken) {
+  return itemRequest(`${ADMIN_ITEM_REQUESTS_URL}/access`, { accessToken });
+}
+
+export function getPendingItemRequests(accessToken, filters = {}) {
+  return itemRequest(withQuery(`${ADMIN_ITEM_REQUESTS_URL}/pending`, filters), {
+    accessToken,
+  });
+}
+
+export function getReviewItemRequest(requestId, accessToken) {
+  return itemRequest(`${ADMIN_ITEM_REQUESTS_URL}/${requestId}`, {
+    accessToken,
+  });
+}
+
+export function approveItemRequest(requestId, accessToken) {
+  return itemRequest(`${ADMIN_ITEM_REQUESTS_URL}/${requestId}/approve`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function rejectItemRequest(requestId, reviewNotes, accessToken) {
+  return itemRequest(`${ADMIN_ITEM_REQUESTS_URL}/${requestId}/reject`, {
+    method: "PATCH",
+    accessToken,
+    body: { reviewNotes },
+  });
+}
+
+export function requestItemRequestChanges(
+  requestId,
+  reviewNotes,
+  accessToken,
+) {
+  return itemRequest(
+    `${ADMIN_ITEM_REQUESTS_URL}/${requestId}/request-changes`,
+    {
+      method: "PATCH",
+      accessToken,
+      body: { reviewNotes },
+    },
+  );
+}
+
+export function createItemRequestOffer(
+  requestId,
+  { message, organizationId },
+  accessToken,
+) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}/offers`, {
+    method: "POST",
+    accessToken,
+    body: { message, organizationId: organizationId || null },
+  });
+}
+
+export function getItemRequestOffers(requestId, accessToken) {
+  return itemRequest(`${ITEM_REQUESTS_URL}/${requestId}/offers`, {
+    accessToken,
+  });
+}
+
+export function getMyItemRequestOffers(accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/me`, { accessToken });
+}
+
+export function acceptItemRequestOffer(offerId, accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/${offerId}/accept`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function rejectItemRequestOffer(offerId, accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/${offerId}/reject`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function withdrawItemRequestOffer(offerId, accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/${offerId}/withdraw`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function cancelItemRequestOffer(offerId, accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/${offerId}/cancel`, {
+    method: "PATCH",
+    accessToken,
+  });
+}
+
+export function updateItemRequestHandover(offerId, details, accessToken) {
+  return itemRequest(`${ITEM_REQUEST_OFFERS_URL}/${offerId}/handover`, {
+    method: "PATCH",
+    accessToken,
+    body: details,
+  });
+}
+
+export function confirmItemRequestHandover(offerId, accessToken) {
+  return itemRequest(
+    `${ITEM_REQUEST_OFFERS_URL}/${offerId}/confirm-handover`,
+    {
+      method: "PATCH",
+      accessToken,
+    },
+  );
+}

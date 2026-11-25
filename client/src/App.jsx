@@ -23,6 +23,9 @@ import OwnerDashboard from "./pages/ownerDashboard";
 import Items from "./pages/items";
 import ItemDetails from "./pages/itemDetails";
 import ItemForm from "./pages/itemForm";
+import HelpRequests from "./pages/helpRequests";
+import ItemRequestForm from "./pages/itemRequestForm";
+import ItemRequestDetails from "./pages/itemRequestDetails";
 
 export default function App() {
   return (
@@ -129,9 +132,26 @@ export default function App() {
           }
         />
         <Route path="/items/:id" element={<ItemDetails />} />
+        <Route path="/help-requests" element={<HelpRequests />} />
         <Route
-          path="/help-requests"
-          element={<ComingSoon title="Help Requests" />}
+          path="/help-requests/new"
+          element={
+            <ProtectedRoute>
+              <ItemRequestForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help-requests/:id/edit"
+          element={
+            <ProtectedRoute>
+              <ItemRequestForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help-requests/:id"
+          element={<ItemRequestDetails />}
         />
         <Route
           path="/projects"
