@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const itemRequestController = require("../controller/itemRequestController");
+const itemRequestOfferController = require("../controller/itemRequestOfferController");
 const Middleware = require("../middleware/authMiddleware");
 
 router.get(
@@ -16,6 +17,18 @@ router.post(
   "/",
   Middleware.authMiddleware,
   itemRequestController.createRequest,
+);
+
+router.get(
+  "/:id/offers",
+  Middleware.authMiddleware,
+  itemRequestOfferController.getRequestOffers,
+);
+
+router.post(
+  "/:id/offers",
+  Middleware.authMiddleware,
+  itemRequestOfferController.createOffer,
 );
 
 router.get(
