@@ -9,6 +9,7 @@ const applicationRoutes = require("./src/routes/applicationRoutes");
 const itemRoutes = require("./src/routes/itemRoutes");
 const itemClaimRoutes = require("./src/routes/itemClaimRoutes");
 const itemRequestRoutes = require("./src/routes/itemRequestRoutes");
+const adminItemRequestRoutes = require("./src/routes/adminItemRequestRoutes");
 const cookieparser = require("cookie-parser");
 const app = express();
 require("dotenv").config();
@@ -46,6 +47,7 @@ app.use("/api/opportunity-applications", applicationRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/item-claims", itemClaimRoutes);
 app.use("/api/item-requests", itemRequestRoutes);
+app.use("/api/admin/item-requests", adminItemRequestRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
