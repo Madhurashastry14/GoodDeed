@@ -26,6 +26,8 @@ import ItemForm from "./pages/itemForm";
 import HelpRequests from "./pages/helpRequests";
 import ItemRequestForm from "./pages/itemRequestForm";
 import ItemRequestDetails from "./pages/itemRequestDetails";
+import AdminItemRequests from "./pages/adminItemRequests";
+import ReviewerRoute from "./components/reviewerRoute";
 
 export default function App() {
   return (
@@ -168,6 +170,15 @@ export default function App() {
             <ProtectedRoute>
               <MyActivities />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/item-requests"
+          element={
+            <ReviewerRoute>
+              <AdminItemRequests />
+            </ReviewerRoute>
           }
         />
 
